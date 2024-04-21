@@ -1,3 +1,4 @@
+
 "use client";
 import Image from "next/image";
 import { Meetup, defaultMeetup, User, defaultUser } from "@/types";
@@ -8,6 +9,20 @@ import { useRouter } from "next13-progressbar"
 //AOS - animate on scroll library
 import AOS from 'aos'
 import 'aos/dist/aos.css';
+
+//nextui
+import {
+    Navbar,
+    NavbarContent,
+    NavbarBrand,
+    Button,
+    Link,
+    Card,
+    CardHeader,
+    CardBody,
+    NavbarItem
+} from "@nextui-org/react"
+
 
 type Feature = {
     name: string,
@@ -47,56 +62,61 @@ export default function Home() {
     return (
         <div className="h-[100vh] w-full">
 
-            <header className="flex items-center justify-between h-20 bg-slate-900">
-                <div className="flex justify-start items-center">
-                    <img
-                        src="/sm-dark-logo.png"
-                        alt="Logo"
-                        className="max-h-20 px-[-10px] m-[-10px]"
-                    />
-                    <h1 className="text-[2vh] m-0 font-semibold">EventSync</h1>
-                </div>
-                <div className="flex justify-end gap-[2vw]">
-                    <button onClick={() => router.push("/about")} className="text-1xl text-center font-bold bg-none rounded-md hover:text-gray-500 transition-colors duration-300 delay-100 ease-in-outs">About Us</button>
-                    <button onClick={() => router.push("/login")} className="text-1xl mr-[2vw] p-4 text-center font-bold w-32 bg-blue-500 hover:bg-blue-700 transition-colors duration-300 rounded-md">Login</button>
-                </div>
-            </header>
+            <Navbar maxWidth="full">
+                <NavbarContent justify="start">
+                    <NavbarBrand>
+                        <Image
+                            src="/sm-dark-logo.png"
+                            width={60}
+                            height={60}
+                            alt="Logo"
+                            className="max-h-20 px-[-10px] m-[-10px]"
+                        />
+                        <h1>EventSync</h1>
+                    </NavbarBrand>
+                </NavbarContent>
+                <NavbarContent justify="end">
+                    <NavbarItem>
+                        <Link onClick={() => router.push("/about")} className="cursor-pointer text-white">About Us</Link>
+                    </NavbarItem>
+                    <NavbarItem>
+                        <Button onClick={() => router.push("/login")} color="primary">Login</Button>
+                    </NavbarItem>
+                </NavbarContent>
+            </Navbar>
+
 
             <section className="flex flex-col items-center justify-center h-[100vh] text-center bg-gradient-to-b from-slate-900 to-black">
-                <h1 data-aos="fade-right" data-aos-duration="700" className="text-[4vw] font-bold mb-4">Connect, Plan, and Hang Out!</h1>
+                <h1 data-aos="fade-right" data-aos-duration="700" className="text-5xl font-bold mb-4">Connect, Plan, and Hang Out!</h1>
                 <h2 data-aos="fade-left" data-aos-duration="700" className="text-[3vw]">Bringing Friends Together Has Never Been Easier</h2>
             </section>
 
+
             <section className="text-center items-center mb-[25vh] mx-[5vw]">
-                <h1 data-aos="fade-right" data-aos-duration="1000" className="font-bold text-[4vw] mb-4">What is EventSync?</h1>
+                <h1 data-aos="fade-right" data-aos-duration="1000" className="font-bold text-xl mb-4">What is EventSync?</h1>
                 <p data-aos="fade-left" data-aos-duration="1000" className="text-[2vw] text-center">
-                    EventSync is your all-in-one solution for effortless event planning and 
-                    coordination. Our platform simplifies the process of organizing memorable 
-                    gatherings with friends, offering intuitive tools for scheduling, 
-                    location sharing, attendee management, and real-time notifications. With 
-                    EventSync, you can easily connect with friends, plan hangouts, and create 
-                    unforgettable experiences, making every event a special celebration of friendship 
-                    and joy. Say goodbye to the hassle of coordinating events and hello to seamless 
+                    EventSync is your all-in-one solution for effortless event planning and
+                    coordination. Our platform simplifies the process of organizing memorable
+                    gatherings with friends, offering intuitive tools for scheduling,
+                    location sharing, attendee management, and real-time notifications. With
+                    EventSync, you can easily connect with friends, plan hangouts, and create
+                    unforgettable experiences, making every event a special celebration of friendship
+                    and joy. Say goodbye to the hassle of coordinating events and hello to seamless
                     socializing with EventSync!
                 </p>
             </section>
 
-            <section className="flex flex-col items-center justify-center text-center mt-0 m-10">
-                <h1 className="text-[4vw] font-bold">Revolutionizing The Way Friends Connect</h1>
-                <section className="py-8">
-                    <div className="container mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {features.map((feature) => (
-                                <div key={feature.id} data-aos="flip-down" data-aos-duration="1000" className="rounded-lg bg-slate-900 p-4">
-                                    <img className="w-full h-64 rounded-lg border-solid border-1 border-gray-500 mb-4" alt={feature.name + " demo image"} />
-                                    <h3 className="text-2xl font-semibold mb-2">{feature.name}</h3>
-                                    <p>{feature.info}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+
+            <section className="gap-4 grid grid-cols-3">
+                {features.map((feature) => (
+                    <Card key={feature.id} data-aos="flip-down" data-aos-duration="1000">
+                        <Image src="/lg-dark-logo.png" width={100} height={100} alt={feature.name + " demo image"} />
+                        <CardHeader>{feature.name}</CardHeader>
+                        <CardBody>{feature.info}</CardBody>
+                    </Card>
+                ))}
             </section>
+
 
             <section className="flex text-center items-center justify-center mt-14">
                 <div>
@@ -105,9 +125,10 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="flex h-20 pr-6 text-center justify-between bg-slate-900">
-                <img className="h-30 ml-4 justify-start" src="/lg-dark-logo.png" />
-                <button onClick={() => router.push("/about")} className="text-1xl text-center font-bold w-32 bg-none rounded-md hover:text-gray-500 transition-colors duration-300 delay-100 ease-in-out">About Us</button>
+
+            <section className="flex justify-between">
+                <Image width={100} height={100} src="/lg-dark-logo.png" alt="logo" />
+                <Link onClick={() => router.push("/about")} className="cursor-pointer text-white">About Us</Link>
             </section>
         </div>
     );
