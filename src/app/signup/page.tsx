@@ -38,7 +38,6 @@ function SignupComponent() {
     }
     const googleSignup = useGoogleLogin({
         flow: "auth-code",
-
         onSuccess: codeResponse => {
             fetch(process.env.NEXT_PUBLIC_GOOGLE_URL+'/auth/google', {
                 method: 'POST',

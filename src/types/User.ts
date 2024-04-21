@@ -13,7 +13,8 @@ interface UserParams {
     theme?: "light" | "dark" | "system";
     verified?: boolean;
     friends?: string[];
-    googleAccount?: GoogleAuth;
+    googleAccount?: GoogleAuth | null;
+    interests?: string[];
 }
 
 class User {
@@ -28,8 +29,9 @@ class User {
     verified: boolean; // Whether the user has verified their email
     friends: string[]; // Array of user ids
     googleAccount: GoogleAuth | null; // Google account information
+    interests: string[]; // Array of interests
 
-    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount}: UserParams) {
+    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests}: UserParams) {
         this._id = _id ? _id : generateSnowflake();
         this.username = username;
         this.email = email;
@@ -41,6 +43,7 @@ class User {
         this.verified = verified ? verified : false;
         this.friends = friends ? friends : [];
         this.googleAccount = googleAccount ? googleAccount : null;
+        this.interests = interests ? interests : [];
     }
 
     // Converts a User instance to a JSON object
@@ -56,7 +59,8 @@ class User {
             theme: this.theme,
             verified: this.verified,
             friends: this.friends,
-            googleAccount: this.googleAccount
+            googleAccount: this.googleAccount,
+            interests: this.interests
         };
     }
 }

@@ -28,7 +28,7 @@ function LoginComponent() {
     }
     const googleLogin = useGoogleLogin({
         flow: "auth-code",
-
+        scope: "openid profile email https://www.googleapis.com/auth/calendar.events",
         onSuccess: codeResponse => {
             fetch(process.env.NEXT_PUBLIC_GOOGLE_URL+'/auth/google', {
                 method: 'POST',

@@ -11,7 +11,7 @@ import fetchData from './fetchData';
 
 
 export default function Dashboard() {
-    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status } = useDashboardState();
+    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups} = useDashboardState();
 
     useEffect(() => {
         fetchData({
@@ -24,7 +24,9 @@ export default function Dashboard() {
             meetups,
             notifications,
             router,
-            status
+            status,
+            knownMeetups,
+            setKnownMeetups
         });
     }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups]);
 
@@ -48,9 +50,16 @@ export default function Dashboard() {
                             </Button>
                         </div>
                     </div>
-                    <div className={meetups.length > 0 ? "flex overflow-y-scroll flex-col w-full h-full p-4" : "flex h-full w-full justify-center items-center"}>
+                    <div className={meetups.length > 0 ? "lg:flex grid auto-cols-auto overflow-y-scroll lg:flex-col w-full h-full p-4" : "flex h-full w-full justify-center items-center"}>
                         { meetups.map((meetup, index) => (
-                            <MeetupCard meetup={meetup} creator={user} small={true} key={index}/>
+                            <>
+                            <div className="hidden lg:block">
+                                <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={false} key={index}/>
+                            </div>
+                            <div className="lg:hidden block mb-2 w-full">
+                                <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={true} key={index}/>
+                            </div>
+                            </>
                         ))}
                         { meetups.length == 0 &&
                             <><div className="flex flex-col rounded-md w-auto h-auto p-4">
@@ -64,7 +73,7 @@ export default function Dashboard() {
                     <p className="dark:text-white text-2xl flex text-center font-bold bg-white dark:bg-transparent border-b dark:border-stone-800 p-4 py-5">Notifications</p>
                     <div className="flex flex-col w-full p-4 overflow-y-scroll">
                         { notifications.map((notification, index) => (
-                            <NotificationCard notification={notification} meetup={notification?.meetup? meetups.find((meetup) => meetup?._id == notification.meetup) || null : null} initiator={notification?.initiator ? knownUsers.find((user) => user._id == notification.initiator) || null : null} key={index}/>
+                            <NotificationCard notification={notification} meetup={notification?.meetup? knownMeetups.find((meetup) => meetup?._id == notification.meetup) || null : null} initiator={notification?.initiator ? knownUsers.find((user) => user._id == notification.initiator) || null : null} key={index}/>
                         ))}
                     </div>
                 </div>

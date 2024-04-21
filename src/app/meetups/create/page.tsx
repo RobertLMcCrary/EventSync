@@ -9,14 +9,14 @@ import CreateMeetupStep3 from "@/app/components/create-meetup/createMeetupStep3"
 import useSession from "@/app/components/utils/sessionProvider";
 import {useRouter} from "next13-progressbar";
 import {userContext} from "@/app/providers";
+import {now, getLocalTimeZone} from '@internationalized/date';
 
 export default function CreateMeetup() {
     const {user, updateUser} = useContext(userContext);
     const [step, setStep] = useState(1);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [date, setDate] = useState<Date>(new Date());
-    const [time, setTime] = useState("");
+    const [dateTime, setDateTime] = useState(now(getLocalTimeZone()));
     const [location, setLocation] = useState("");
     const [attendees, setAttendees] = useState<User[]>([]);
     const loadingUserObj = new User({
@@ -35,6 +35,31 @@ export default function CreateMeetup() {
 
     function createMeetup() {
         setMeetupCreationLoading(1)
+        if (user?.googleAccount) {
+            fetch(process.env.NEXT_PUBLIC_GOOGLE_URL + '/google/createEvent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    tokens: user.googleAccount,
+                    userID: user._id,
+                    meetup: {
+                        title: name,
+                        description: description,
+                        date: dateTime,
+                        location: location,
+                        invited: attendees.map((user) => user.email)
+                    }
+                })
+            }).then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .catch(error => console.error('Error:', error));
+        }
         fetch('/api/meetup/create', {
             method: 'POST',
             headers: {
@@ -44,7 +69,7 @@ export default function CreateMeetup() {
             body: JSON.stringify({
                 title: name,
                 description: description,
-                date: date,
+                date: dateTime.toDate(),
                 location: location,
                 creator: session.session.userID,
                 invited: attendees.map((user) => user._id)
@@ -68,7 +93,7 @@ export default function CreateMeetup() {
         }).then((data) => {
             data.json().then((user) => {
                 setUserEmail(user.email);
-                console.log(user.friends);
+
                 if (user.friends.length == 0) {
                     const defaultFriendsUser = new User({
                         _id: "0",
@@ -121,7 +146,7 @@ export default function CreateMeetup() {
                 </div>
                 <div className=" flex justify-center items-center h-full w-full">
                     {step == 1 ? <CreateMeetupStep1 name={name} description={description} setName={setName} setDescription={setDescription} changeStep={changeStep}/> : null}
-                    {step == 2 ? <CreateMeetupStep2 time={time} location={location} date={date} changeStep={changeStep} setLocation={setLocation} setTime={setTime} setDate={setDate}/> : null}
+                    {step == 2 ? <CreateMeetupStep2 location={location} dateTime={dateTime} changeStep={changeStep} setLocation={setLocation} setDateTime={setDateTime}/> : null}
                     {step == 3 ? <CreateMeetupStep3 attendees={attendees} createMeetup={createMeetup} meetupCreationLoading={meetupCreationLoading} userEmail={userEmail} setAttendees={setAttendees} friends={friends}/> : null}
                 </div>
             </div>

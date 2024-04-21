@@ -1,7 +1,7 @@
 import { UserGroupIcon, ClockIcon, CalendarIcon } from "@heroicons/react/20/solid";
 import { Meetup, User } from "@/types";
 import {Button, Avatar, Skeleton, Image} from "@nextui-org/react";
-import {Card, CardBody, CardHeader} from "@nextui-org/card";
+import {Card, CardBody, CardFooter} from "@nextui-org/card";
 import {Divider} from "@nextui-org/divider";
 import {useRouter} from "next13-progressbar";
 
@@ -11,6 +11,30 @@ export default function MeetupCard({ meetup, creator, small }: { meetup: Meetup 
     const startTime = meetup? new Date(meetup.date).toLocaleTimeString() : '';
     const startDate = meetup? new Date(meetup.date).toLocaleDateString() : '';
     const router = useRouter();
+
+    if (small){
+        return (
+            <Card
+                isFooterBlurred
+                radius="lg"
+                className="border-none w-full max-w-52 h-auto aspect-square"
+
+            >
+                <Image
+                    className="object-cover w-full h-full aspect-square"
+                    alt={meetup?.title}
+                    src={meetup?.image}
+
+                />
+                <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+                    <p className="text-tiny text-white/80">{meetup?.title}</p>
+                    <Button onClick={()=>router.push(`/meetups/${meetup?._id}`)} className="text-tiny text-white bg-black/20" variant="flat" color="default" radius="lg" size="sm">
+                        View
+                    </Button>
+                </CardFooter>
+            </Card>
+        )
+    }
 
     return (
         <Card className="max-w-600px mb-4 overflow-visible">
@@ -33,7 +57,7 @@ export default function MeetupCard({ meetup, creator, small }: { meetup: Meetup 
                             </div>
 
                             <Skeleton isLoaded={!!creator} className={!creator? "w-6 h-6 rounded-full" : ""}></Skeleton>
-                            {creator ?<Avatar isBordered radius="sm" src="https://i.pravatar.cc/150?u=a042581f4e29026024d" className="w-6 h-6 text-tiny"  /> : null}
+                            {creator ?<Avatar isBordered radius="full" src={creator.avatar} className="w-6 h-6 text-tiny"  /> : null}
                         </div>
 
                         </div>

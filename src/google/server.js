@@ -18,6 +18,26 @@ const oAuth2Client = new google.auth.OAuth2(
     'postmessage'
 );
 
+
+async function refreshAccessToken(userID, refreshToken) {
+    const user = new UserRefreshClient(
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+        refreshToken,
+    );
+
+    const { credentials } = await user.refreshAccessToken(); // obtain new tokens
+
+    await updateUser(
+        userID,
+        { $set: { "googleAccount": credentials } }
+    );
+
+    return credentials;
+}
+
+
+
 app.post('/auth/google', async (req, res) => {
     const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
 
@@ -28,6 +48,9 @@ app.post('/auth/google', async (req, res) => {
 
     if (req.body.inviteEmail && req.body.inviteEmail !== data.email) {
         return res.status(401).json({error: `Please use ${req.body.inviteEmail} to signup and accept this invite`});
+    }
+    if (req.body.integrationEmail && req.body.integrationEmail !== data.email) {
+        return res.status(401).json({error: `Please use ${req.body.integrationEmail} to connect your google account`});
     }
     // Check if user exists in database
     // If user exists, update tokens
@@ -94,9 +117,12 @@ app.post('/auth/google', async (req, res) => {
     }
 });
 
+/*
 app.post('/revoke', async (req, res) => {
-
+    return;
 });
+*/
+
 app.post('/user', async (req, res) => {
     const {tokens, userID} = req.body;
 
@@ -133,21 +159,59 @@ app.post('/user', async (req, res) => {
     }
 });
 
-async function refreshAccessToken(userID, refreshToken) {
-    const user = new UserRefreshClient(
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
-        refreshToken,
-    );
+app.post('/google/createEvent', async (req, res) => {
 
-    const { credentials } = await user.refreshAccessToken(); // obtain new tokens
+    const {tokens, userID, meetup} = req.body;
+    if (!tokens || !userID || !meetup) {
+        return res.status(400).json({message: "Invalid request"});
+    }
 
-    await updateUser(
-        userID,
-        { $set: { "googleAccount": credentials } }
-    );
+    const decodedToken = jwt.decode(tokens.id_token);
+    const currentTimestamp = Math.floor(Date.now() / 1000);
 
-    return credentials;
-}
+    if (decodedToken.exp < currentTimestamp) {
+        const credentials = await refreshAccessToken(userID, tokens.refresh_token);
+        oAuth2Client.setCredentials(credentials);
+    } else {
+        oAuth2Client.setCredentials(tokens);
+    }
+
+    const calendar = google.calendar({version: 'v3', auth: oAuth2Client});
+    const event = {
+        summary: meetup.title,
+        location: meetup.location,
+        description: meetup.description,
+        start: {
+            dateTime: meetup.date,
+            timeZone: 'America/Los_Angeles',
+        },
+        end: {
+            dateTime: meetup.date,
+            timeZone: 'America/Los_Angeles',
+        },
+        attendees: meetup.invited.map(email => ({email})),
+        reminders: {
+            useDefault: false,
+            overrides: [
+                {method: 'email', minutes: 24 * 60},
+                {method: 'popup', minutes: 10},
+            ],
+        },
+    };
+
+
+
+    await calendar.events.insert({
+        calendarId: 'primary',
+        resource: event,
+    }, (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.json(err);
+        }
+        return res.json(data);
+    });
+});
+
 
 app.listen(3002, () => console.log(`server is running`));

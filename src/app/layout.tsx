@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " no-scrollbar"}>
+      <body className={inter.className + " no-scrollbar text-black dark:text-white"}>
       <Providers>
         {children}
       </Providers>

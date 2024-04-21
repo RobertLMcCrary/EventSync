@@ -29,6 +29,18 @@ class GoogleAuth {
         this.expiry_date = expiry_date;
         this.id_token = id_token;
     }
+
+    toJSON() {
+        return {
+            expires_in: this.expires_in,
+            refresh_token: this.refresh_token,
+            access_token: this.access_token,
+            scope: this.scope,
+            token_type: this.token_type,
+            id_token: this.id_token,
+            expiry_date: this.expiry_date,
+        }
+    }
 }
 
 export { GoogleAuth }

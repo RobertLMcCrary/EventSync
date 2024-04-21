@@ -1,11 +1,11 @@
 'use client'
 
 import {NextUIProvider} from '@nextui-org/react'
-import {ThemeProvider as NextThemesProvider} from "next-themes";
+import {ThemeProvider as NextThemesProvider, useTheme} from "next-themes";
 import {useRouter} from "next13-progressbar";
 import { Next13ProgressBar } from 'next13-progressbar';
 import useSession from "@/app/components/utils/sessionProvider";
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import {usePathname} from 'next/navigation';
 import {User} from "@/types";
 import useUserTheme from "@/app/components/utils/theme/updateTheme";
@@ -27,9 +27,9 @@ export function Providers({children}: { children: React.ReactNode }) {
     const session = useSession();
     const [user, setUser] = useState<User | null>(null);
     const pathname = usePathname();
-    const [theme, setTheme] = useUserTheme();
+    const { setTheme } = useTheme();
 
-    const updateUser = async () => {
+    const updateUser = useCallback(async () => {
         fetch(`/api/user/${session.session.userID}`, {
             method: 'GET',
             headers: {
@@ -38,12 +38,17 @@ export function Providers({children}: { children: React.ReactNode }) {
             },
         }).then((data) => {
             data.json().then((userData) => {
-                if ("error" in userData) return;
+                if ("error" in userData){
+                    router.push("/login");
+                    return;
+                }
                 setUser(userData);
+                console.log(userData.theme);
                 setTheme(userData.theme);
             });
         });
-    }
+    }, [router, session.session.token, session.session.userID, setTheme])
+
     useEffect(() => {
         // Only fetch user data if the route is protected
         if (pathname == "/login" && user){
@@ -77,11 +82,18 @@ export function Providers({children}: { children: React.ReactNode }) {
             });
         }
 
-    }, [pathname, router, session.session.token, session.session.userID, session.status, setTheme, user]);
+        const intervalId = setInterval(async () => {
+                await updateUser();
+        }, 60 * 1000); // 60 seconds
+
+        // Clear the interval when the component is unmounted
+        return () => clearInterval(intervalId);
+
+    }, [pathname, router, session.session.token, session.session.userID, session.status, setTheme, updateUser, user]);
 
     return (
         <NextUIProvider navigate={router.push}>
-            <NextThemesProvider attribute="class" defaultTheme="dark">
+            <NextThemesProvider attribute="class" defaultTheme="system">
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
                     <userContext.Provider value={{user, updateUser}}>
                         {children}

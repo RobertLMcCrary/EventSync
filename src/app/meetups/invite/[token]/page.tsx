@@ -119,6 +119,7 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
                 initiator: session.session.userID,
                 receiver: meetup.creator,
                 meetup: meetup._id,
+                buttonHREF: `/meetups/${meetup._id}`,
                 type: 2
             })
         });
@@ -154,7 +155,8 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
                 initiator: session.session.userID,
                 receiver: meetup.creator,
                 meetup: meetup._id,
-                type: 3
+                type: 3,
+                buttonHREF: `/meetups/${meetup._id}`
             })
         });
 

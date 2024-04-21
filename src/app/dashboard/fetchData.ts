@@ -12,9 +12,11 @@ interface fetchParams {
     notifications: (AppNotification | null)[],
     router: any;
     status: string;
+    knownMeetups: (Meetup)[];
+    setKnownMeetups: any;
 }
 
-export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status} : fetchParams){
+export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups} : fetchParams){
     if (!user) return;
     if (!knownUsers.includes(user)) setKnownUsers((prev: any) => [...prev, user]);
 
@@ -23,6 +25,45 @@ export default function fetchData({session, setKnownUsers, user, setNotification
         return;
     }
     if (status != 'done') return;
+
+
+
+
+    if (user.meetups && meetups.includes(null)) {
+        setMeetups([]);
+        user.meetups.forEach((meetupID: string) => {
+            fetch(`/api/meetup/${meetupID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.token}`
+                }
+            }).then((res) => {
+                res.json().then((meetup) => {
+                    if ('error' in meetup) {
+                        router.push('/login?redirect=/dashboard');
+                        return;
+                    }
+                    setMeetups((prev: any) => [...prev, meetup]);
+                    setKnownMeetups((prev: any) => [...prev, meetup]);
+                    if (knownUsers.find((user: User) => user._id == meetup.creator)) {
+                        return;
+                    }
+                    fetch(`/api/user/${meetup.creator}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session.token}`
+                        }
+                    }).then((res) => {
+                        res.json().then((creator) => {
+                            setKnownUsers((prev: any) => [...prev, creator]);
+                        });
+                    });
+                });
+            });
+        });
+    }
 
     if (user.notifications && notifications.includes(null)) {
         setNotifications([]);
@@ -52,47 +93,26 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                             });
                         });
                     }
-                });
-            });
-        });
-    }
-
-
-    if (!user.meetups || !meetups.includes(null)){
-        return;
-    }
-
-    setMeetups([]);
-    user.meetups.forEach((meetupID: string) => {
-        fetch(`/api/meetup/${meetupID}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.token}`
-            }
-        }).then((res) => {
-            res.json().then((meetup) => {
-                if ('error' in meetup) {
-                    router.push('/login?redirect=/dashboard');
-                    return;
-                }
-                setMeetups((prev: any) => [...prev, meetup]);
-                if (knownUsers.find((user: User) => user._id == meetup.creator)) {
-                    return;
-                }
-                fetch(`/api/user/${meetup.creator}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.token}`
+                    if (notification.meetup){
+                        if (knownMeetups.find((meetup: Meetup) => meetup._id == notification.meetup)) {
+                            return;
+                        }
+                        fetch(`/api/meetup/${notification.meetup}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.token}`
+                            }
+                        }).then((res) => {
+                            res.json().then((meetup) => {
+                                setKnownMeetups((prev: any) => [...prev, meetup]);
+                            });
+                        });
                     }
-                }).then((res) => {
-                    res.json().then((creator) => {
-                        setKnownUsers((prev: any) => [...prev, creator]);
-                    });
                 });
             });
         });
-    });
+    }
+
 
 }

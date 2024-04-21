@@ -10,6 +10,7 @@ export default function useDashboardState() {
     const [search, setSearch] = useState('');
     const [knownUsers, setKnownUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<(AppNotification | null)[]>([null, null, null, null]);
+    const [knownMeetups, setKnownMeetups] = useState<Meetup[]>([]);
     const router = useRouter();
     // Get TOKEN from cookie
     const { session, status } = useSession();
@@ -26,7 +27,9 @@ export default function useDashboardState() {
         setNotifications,
         router,
         session,
-        status
+        status,
+        knownMeetups,
+        setKnownMeetups
     };
 
 }
