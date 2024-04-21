@@ -4,8 +4,11 @@ import Sidebar from "@/app/components/sidebar";
 import { Card, CardBody } from "@nextui-org/card";
 import {
   ClockIcon,
+  MagnifyingGlassIcon,
   MapPinIcon,
   PaperAirplaneIcon,
+  PlusIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@nextui-org/react";
 import { useRouter } from "next13-progressbar";
@@ -19,6 +22,11 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
   let [user, setUser] = useState<User | null>(null);
   let [meetup, setMeetup] = useState<Meetup | null>(null);
   let [loadingUser, setLoadingUser] = useState(true);
+
+  let [newAnnouncementVis, setNewAnnouncementVis] = useState(false);
+  let [searchAnnouncementsVis, setSearchAnnouncementsVis] = useState(false);
+  let [announcementInput, setAnnouncementInput] = useState("");
+  let [searchInput, setSearchInput] = useState("");
 
   const router = useRouter();
 
@@ -61,9 +69,9 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
   return (
     <div className="flex flex-row bg-gray-100 dark:bg-black h-screen w-screen">
       <Sidebar user={defaultUser} active="meetups" />
-      <div className="flex items-center justify-center align-middle flex-col h-screen w-full p-4 md:p-8">
+      <div className="flex items-center justify-center align-middle h-screen w-full p-4 md:p-8">
         <Card className="w-full h-full">
-          <CardBody className="p-0">
+          <CardBody className="md:overflow-hidden p-0">
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg"
               className="border-b-[1.5px] border-gray-500 w-full h-1/4 object-cover rounded-t-xl"
@@ -185,17 +193,48 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
                     </Button>
                   </div>
                 </div>
-                <div className="flex-1 mt-12 md:mt-0">
-                  <h1 className="text-lg font-semibold border-b border-gray-300 dark:border-gray-700 pb-3 mb-3">
-                    Announcements
-                  </h1>
-                  <ul>
-                    <li className="flex border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                      <textarea
-                        placeholder="Enter new announcement here"
+                <div className="bg-gray-100 p-4 rounded-md flex-1 mt-12 md:mt-0">
+                  <div className="flex w-full border-b border-gray-300 dark:border-gray-700 pb-3 mb-3">
+                    <h1 className="text-lg font-semibold">Announcements</h1>
+                    <div className="flex gap-1 ml-auto">
+                      <button
+                        onClick={() => {
+                          if (newAnnouncementVis) {
+                            setNewAnnouncementVis(false);
+                          } else {
+                            setNewAnnouncementVis(true);
+                            setSearchAnnouncementsVis(false);
+                          }
+                        }}
+                      >
+                        <PlusIcon className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (searchAnnouncementsVis) {
+                            setSearchAnnouncementsVis(false);
+                          } else {
+                            setSearchAnnouncementsVis(true);
+                            setNewAnnouncementVis(false);
+                          }
+                        }}
+                      >
+                        <MagnifyingGlassIcon className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all" />
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <div
+                      className={`${
+                        newAnnouncementVis ? "flex" : "hidden"
+                      } border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3`}
+                    >
+                      <input
+                        placeholder="Enter new announcement..."
                         className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3"
-                        rows={1}
-                      ></textarea>
+                        value={announcementInput}
+                        onChange={(e) => setAnnouncementInput(e.target.value)}
+                      />
                       <button
                         className="ml-3"
                         onClick={() => {
@@ -204,30 +243,74 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
                       >
                         <PaperAirplaneIcon className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all" />
                       </button>
-                    </li>
-                    <li className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                      <p>
-                        auctor lectus eget pulvinar pellentesque. Suspendisse
-                        sollicitudin vulputate justo, ut venenatis metus posuere
-                        at. Duis tempor aliqua.
-                      </p>
-                    </li>
-                    <li className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                      <p>
-                        lputate justo, ut venenatis metus posuere at. Duis
-                        tempor aliquam nibh, elementum magna finibus quis. Proin
-                        cursus ultrices bibendum.
-                      </p>
-                    </li>
-                    <li className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                      <p>
-                        Quisque et malesuada dolor, porta aliquam dolor. In
-                        posuere, sapien at tristique aliquam, orci quam maximus
-                        ipsum, sed viverra eros elit ac eros. Donec pretium, est
-                        ut viv.
-                      </p>
-                    </li>
-                  </ul>
+                    </div>
+                    <div
+                      className={`${
+                        searchAnnouncementsVis ? "flex" : "hidden"
+                      } border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3`}
+                    >
+                      <input
+                        placeholder="Search..."
+                        className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                      <button
+                        className="ml-3"
+                        onClick={() => {
+                          console.log("Clicked 'Clear search'!");
+                          setSearchInput("");
+                        }}
+                      >
+                        <XMarkIcon className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all" />
+                      </button>
+                    </div>
+                    <div className="md:overflow-y-scroll md:h-[15rem] lg:h-[17rem]">
+                      <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
+                        <div className="flex align-middle text-sm text-gray-700 mb-1">
+                          <img
+                            src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
+                            className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
+                          />
+                          <span>[name]</span>
+                        </div>
+                        <p>
+                          auctor lectus eget pulvinar pellentesque. Suspendisse
+                          sollicitudin vulputate justo, ut venenatis metus
+                          posuere at. Duis tempor aliqua.
+                        </p>
+                      </div>
+                      <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
+                        <div className="flex align-middle text-sm text-gray-700 mb-1">
+                          <img
+                            src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
+                            className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
+                          />
+                          <span>[name]</span>
+                        </div>
+                        <p>
+                          lputate justo, ut venenatis metus posuere at. Duis
+                          tempor aliquam nibh, elementum magna finibus quis.
+                          Proin cursus ultrices bibendum.
+                        </p>
+                      </div>
+                      <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
+                        <div className="flex align-middle text-sm text-gray-700 mb-1">
+                          <img
+                            src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
+                            className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
+                          />
+                          <span>[name]</span>
+                        </div>
+                        <p>
+                          Quisque et malesuada dolor, porta aliquam dolor. In
+                          posuere, sapien at tristique aliquam, orci quam
+                          maximus ipsum, sed viverra eros elit ac eros. Donec
+                          pretium, est ut viv.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
