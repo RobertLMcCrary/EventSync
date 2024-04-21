@@ -9,6 +9,20 @@ import { useRouter } from "next13-progressbar"
 import AOS from 'aos'
 import 'aos/dist/aos.css';
 
+//nextui
+import {
+    NextUIProvider,
+    Navbar,
+    NavbarContent,
+    NavbarBrand,
+    Button,
+    Link,
+    Card,
+    CardHeader,
+    CardBody,
+    NavbarItem,
+} from "@nextui-org/react"
+
 //team member object for cards
 type TeamMember = {
     name: string;
@@ -56,20 +70,28 @@ function About() {
 
     return (
         <div className="h-[100vh] w-full">
-            <header className="flex justify-between items-center h-20 bg-slate-900 text-white py-4">
-                <div className="flex items-center justify-start">
-                    <img
-                        src="/sm-dark-logo.png"
-                        alt="Logo"
-                        className="max-h-20 p-[-10px] m-[-10px]"
-                    />
-                    <h1 className="text-[2vh] font-semibold">About</h1>
-                </div>
-                <div className="flex justify-end gap-[2vw] mr-[2vw]">
-                    <button onClick={() => router.push("/")} className="text-1xl text-center font-bold bg-none rounded-md hover:text-gray-500 transition-colors duration-300 delay-100 ease-in-outs">Home</button>
-                    <button onClick={() => router.push("/login")} className="text-1xl p-4 text-center font-bold w-32 bg-blue-500 hover:bg-blue-700 transition-colors duration-300 rounded-md">Login</button>
-                </div>
-            </header>
+            <Navbar maxWidth="full">
+                <NavbarContent justify="start">
+                    <NavbarBrand>
+                        <Image
+                            src="/sm-dark-logo.png"
+                            width={60}
+                            height={60}
+                            alt="Logo"
+                            className="max-h-20 px-[-10px] m-[-10px]"
+                        />
+                        <h1>EventSync</h1>
+                    </NavbarBrand>
+                </NavbarContent>
+                <NavbarContent justify="end">
+                    <NavbarItem>
+                        <Link onClick={() => router.push("/")} className="cursor-pointer text-white">Home</Link>
+                    </NavbarItem>
+                    <NavbarItem>
+                        <Button onClick={() => router.push("/login")} color="primary">Login</Button>
+                    </NavbarItem>
+                </NavbarContent>
+            </Navbar>
 
             <section className="py-8 px-8">
                 <h2 className="text-2xl font-bold mb-4">Our Team</h2>
@@ -104,17 +126,17 @@ function About() {
                 </div>
             </section>
 
-            <section className="text-center items-center mb-20">
+            <section>
                 <h1 className="text-3xl font-bold">Check us out on <a className="text-blue-600 underline" href="https://www.linkedin.com/company/event-sync/">LinkedIn!</a></h1>
-                <div className="flex justify-around mt-[10vh]">
-                    <img data-aos="fade-down-right" className="h-[20vh]" src="/LinkedIn-logo-for-about-page.png" />
-                    <img data-aos="fade-up-left" className="h-[25vh]" src="/lg-dark-logo.png" />
+                <div className="flex justify-between">
+                    <Image data-aos="fade-down-right" width={100} height={100} src="/LinkedIn-logo-for-about-page.png" alt="LinkedIn Logo" />
+                    <Image data-aos="fade-up-left" width={100} height={100} src="/lg-dark-logo.png" alt="Logo" />
                 </div>
             </section>
 
-            <div className="flex h-20 pr-6 text-center justify-between bg-slate-900">
-                <img className="h-30 ml-4 justify-start" src="/lg-dark-logo.png" />
-                <button onClick={() => router.push("/")} className="text-1xl text-center font-bold w-32 bg-none rounded-md hover:text-gray-500 transition-colors duration-300 delay-100 ease-in-out">Home</button>
+            <div className="flex justify-between">
+                <Image width={100} height={100} src="/lg-dark-logo.png" alt="logo" />
+                <Link onClick={() => router.push("/")} className="cursor-pointer text-white">Home</Link>
             </div>
         </div>
     )
