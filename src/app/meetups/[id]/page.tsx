@@ -1,7 +1,7 @@
 // TODO: Complete the MeetupProfile component
 "use client";
 import Sidebar from "@/app/components/sidebar";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody, Button } from "@nextui-org/react";
 import {
   ClockIcon,
   MagnifyingGlassIcon,
@@ -10,7 +10,6 @@ import {
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "@nextui-org/react";
 import { useRouter } from "next13-progressbar";
 import { Meetup, User, defaultUser } from "@/types";
 import { useEffect, useState } from "react";

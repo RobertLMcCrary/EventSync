@@ -49,7 +49,6 @@ function createMeetup(meetup) {
                     return [4 /*yield*/, (0, user_1.updateUser)(meetup.creator, { $push: { meetups: meetup._id } })];
                 case 1:
                     _a.sent();
-                    console.log(meetup.toJSON());
                     return [4 /*yield*/, meetups.insertOne(meetup.toJSON())];
                 case 2: return [2 /*return*/, _a.sent()];
             }
