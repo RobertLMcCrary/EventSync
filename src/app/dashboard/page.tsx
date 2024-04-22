@@ -50,16 +50,12 @@ export default function Dashboard() {
                             </Button>
                         </div>
                     </div>
-                    <div className={meetups.length > 0 ? "lg:flex grid auto-cols-auto overflow-y-scroll lg:flex-col w-full h-full p-4" : "flex h-full w-full justify-center items-center"}>
+                    <div className={meetups.length > 0 ? "grid space-x-4 space-y-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 overflow-y-scroll lg:flex-col w-full h-full p-4" : "flex h-full w-full justify-center items-center"}>
                         { meetups.map((meetup, index) => (
-                            <>
-                            <div className="hidden lg:block">
-                                <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={false} key={index}/>
-                            </div>
-                            <div className="lg:hidden block mb-2 w-full">
+                            <div key={index} className="">
                                 <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={true} key={index}/>
                             </div>
-                            </>
+
                         ))}
                         { meetups.length == 0 &&
                             <><div className="flex flex-col rounded-md w-auto h-auto p-4">

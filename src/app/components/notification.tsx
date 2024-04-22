@@ -23,7 +23,7 @@ export default function NotificationCard({notification, initiator, meetup} : {no
                         ([1, 2, 3, 11].includes(notification.type) ?
                             (initiator && meetup ?
                                     <Badge content={<Avatar src={initiator?.avatar} radius="full"  className="w-5 h-5 aspect-square"/>} color="default" className="w-6 h-6 p-0 aspect-square">
-                                        <Avatar  isBordered src={meetup?.image} radius="full" size="sm" className="flex-shrink-0"/>
+                                        <Avatar isBordered src={meetup?.image} radius="full" size="sm" className="flex-shrink-0"/>
                                     </Badge>
                                 : <Skeleton className="flex-1 w-20 h-20 aspect-square rounded-full"/>
                             )

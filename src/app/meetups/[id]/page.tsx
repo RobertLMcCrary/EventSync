@@ -13,40 +13,30 @@ import {
 import { useRouter } from "next13-progressbar";
 import { Meetup, User, defaultUser } from "@/types";
 import { useEffect, useState } from "react";
-import useUserTheme from "@/app/components/utils/theme/updateTheme";
+import { useContext } from "react";
+import { userContext } from "@/app/providers";
 import useSession from "@/app/components/utils/sessionProvider";
 
 export default function MeetupProfile({ params }: { params: { id: string } }) {
-  let [userTheme, setUserTheme] = useUserTheme();
-  let [user, setUser] = useState<User | null>(null);
+  const {user, updateUser} = useContext(userContext);
   let [meetup, setMeetup] = useState<Meetup | null>(null);
-  let [loadingUser, setLoadingUser] = useState(true);
-
   let [newAnnouncementVis, setNewAnnouncementVis] = useState(false);
   let [searchAnnouncementsVis, setSearchAnnouncementsVis] = useState(false);
   let [announcementInput, setAnnouncementInput] = useState("");
   let [searchInput, setSearchInput] = useState("");
-
+  let [meetupAttendees, setMeetupAttendees] = useState<User[]>([]);
+  let [meetupUnavailable, setMeetupUnavailable] = useState<User[]>([]);
+  let [meetupUndecided, setMeetupUndecided] = useState<User[]>([]);
+  const [availability, setAvailability] = useState<0 | 1 | 2 | 3>(0);
   const router = useRouter();
+
+
 
   // Get TOKEN from cookie
   const { session, status } = useSession();
 
   useEffect(() => {
-    if (status == "done" && loadingUser) {
-      setLoadingUser(false);
-      fetch(`/api/user/${session.userID}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`,
-        },
-      }).then((data) => {
-        data.json().then((user) => {
-          setUser(user);
-        });
-      });
-
+    if (user && !meetup) {
       fetch(`/api/meetup/` + params.id, {
         method: "GET",
         headers: {
@@ -56,6 +46,19 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
       }).then((data) => {
         data.json().then((meetup) => {
           setMeetup(meetup);
+          if (user._id == meetup.creator) {
+            setMeetupAttendees((prev) => [...prev, user]);
+            setAvailability(3);
+          } else if (meetup.attendees.includes(user._id)) {
+            setMeetupAttendees((prev) => [...prev, user]);
+            setAvailability(1)
+          } else if (meetup.unavailable.includes(user._id)) {
+            setMeetupUnavailable((prev) => [...prev, user]);
+            setAvailability(2)
+          } else {
+            setMeetupUndecided((prev) => [...prev, user]);
+            setAvailability(0);
+          }
         });
       });
     } else if (status == "error") {
@@ -67,12 +70,12 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex flex-row bg-gray-100 dark:bg-black h-screen w-screen">
-      <Sidebar user={defaultUser} active="meetups" />
+      <Sidebar user={user} active="meetups" />
       <div className="flex items-center justify-center align-middle h-screen w-full p-4 md:p-8">
         <Card className="w-full h-full">
           <CardBody className="md:overflow-hidden p-0">
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg"
+              src={meetup?.image}
               className="border-b-[1.5px] border-gray-500 w-full h-1/4 object-cover rounded-t-xl"
             />
             <div className="relative p-8 md:p-14">
@@ -100,12 +103,7 @@ export default function MeetupProfile({ params }: { params: { id: string } }) {
                 </div>
               </div>
               <h2 className="pr-32">
-                [description] Lorem ipsum dolor sit amet, consectetur adipiscing
-                elit. Praesent consequat leo id dui malesuada, ut pharetra erat
-                congue. Maecenas malesuada augue a justo tincidunt molestie.
-                Donec quis tincidunt lorem. Lorem ipsum dolor sit amet,
-                consectetur adipiscing elit. Proin porttitor scelerisque
-                aliquam. Fusce consectetur lao.
+                {meetup?.description}
               </h2>
               <div className="md:flex md:gap-4 mt-6">
                 <div className="flex-1">

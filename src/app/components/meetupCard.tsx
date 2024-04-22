@@ -16,7 +16,7 @@ export default function MeetupCard({ meetup, creator, small }: { meetup: Meetup 
             <Card
                 isFooterBlurred
                 radius="lg"
-                className="border-none w-full max-w-52 h-auto aspect-square"
+                className="border-none w-full h-auto aspect-square"
 
             >
                 <Image

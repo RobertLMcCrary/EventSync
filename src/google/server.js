@@ -113,7 +113,7 @@ app.post('/auth/google', async (req, res) => {
         const token = jwt.sign({ userID: newUser._id, type: 'user' }, process.env.JWT_SECRET, {
             expiresIn: '100m',
         });
-        return res.json({token: token, id: newUser._id});
+        return res.json({token: token, id: newUser._id, user: data});
     }
 });
 

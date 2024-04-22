@@ -15,6 +15,8 @@ interface UserParams {
     friends?: string[];
     googleAccount?: GoogleAuth | null;
     interests?: string[];
+    bio?: string;
+    location?: string;
 }
 
 class User {
@@ -30,20 +32,24 @@ class User {
     friends: string[]; // Array of user ids
     googleAccount: GoogleAuth | null; // Google account information
     interests: string[]; // Array of interests
+    bio: string; // User's bio
+    location: string; // User's location
 
-    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests}: UserParams) {
+    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests, bio, location}: UserParams) {
         this._id = _id ? _id : generateSnowflake();
         this.username = username;
         this.email = email;
         this.password = password;
         this.meetups = meetups ? meetups : [];
-        this.avatar = avatar ? avatar : "https://www.gravatar.com/avatar/";
+        this.avatar = avatar ? avatar : "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-person-2220431045";
         this.notifications = notifications ? notifications : [];
         this.theme = theme? theme : "system";
         this.verified = verified ? verified : false;
         this.friends = friends ? friends : [];
         this.googleAccount = googleAccount ? googleAccount : null;
         this.interests = interests ? interests : [];
+        this.bio = bio ? bio : "";
+        this.location = location ? location : "";
     }
 
     // Converts a User instance to a JSON object
@@ -60,7 +66,9 @@ class User {
             verified: this.verified,
             friends: this.friends,
             googleAccount: this.googleAccount,
-            interests: this.interests
+            interests: this.interests,
+            bio: this.bio,
+            location: this.location,
         };
     }
 }

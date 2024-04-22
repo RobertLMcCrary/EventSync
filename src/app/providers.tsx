@@ -20,7 +20,7 @@ const userContext = createContext<UserWithUpdate>({
     user: null,
     updateUser: async () => {},
 });
-const PROTECTED_ROUTES = ['/dashboard', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
+const PROTECTED_ROUTES = ['/dashboard', '/get-started', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
 export function Providers({children}: { children: React.ReactNode }) {
     const router = useRouter();
 
