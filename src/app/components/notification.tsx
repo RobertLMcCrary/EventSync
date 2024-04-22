@@ -16,7 +16,7 @@ export default function NotificationCard({notification, initiator, meetup} : {no
     }
 
     return (
-        <Card className="mb-4 min-w-52 overflow-visible py-0">
+        <Card className="mb-4 min-w-52 overflow-visible dark:bg-stone-950 py-0">
             <CardHeader className="flex flex-row w-full m-0">
 
                     {notification ?
