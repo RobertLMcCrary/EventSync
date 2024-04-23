@@ -47,6 +47,9 @@ function LoginComponent() {
                             Cookies.set('token', data.token);
                             if (data.id) {
                                 // Redirect to get started page since the user is signing up
+                                if (params.has('redirect')) {
+                                    router.push('/get-started?redirect=' + (params.get('redirect') || '/dashboard'));
+                                }
                                 router.push('/get-started');
                                 return;
                             }

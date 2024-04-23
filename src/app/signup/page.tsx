@@ -196,7 +196,7 @@ function SignupComponent() {
                 return;
             }
             if (searchParams.has("redirect")) {
-                router.push(`/get-started?redirect=${searchParams.get("redirect")}`);
+                router.push(`/get-started?redirect=${searchParams.get("redirect") || '/dashboard'}`);
                 return;
             }
             router.push('/get-started');

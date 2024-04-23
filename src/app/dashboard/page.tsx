@@ -3,7 +3,7 @@
 import Sidebar from "../components/sidebar";
 import MeetupCard from "@/app/components/meetupCard";
 import {useEffect} from "react";
-import {Input, Button, Link} from "@nextui-org/react";
+import {ScrollShadow, Input, Button, Link} from "@nextui-org/react";
 import {MagnifyingGlassIcon, PlusIcon} from "@heroicons/react/24/solid";
 import NotificationCard from "@/app/components/notification";
 import useDashboardState from "@/app/dashboard/useDashboardState";
@@ -32,30 +32,33 @@ export default function Dashboard() {
 
 
     return (
-        <div className="flex flex-row bg-stone-100 dark:bg-stone-950  h-screen w-screen">
+        <div className="flex flex-row bg-stone-100 dark:bg-stone-950 md:h-screen w-screen">
             <Sidebar user={user} active="dashboard"/>
             <div className="flex flex-col h-full w-full ">
                 <div className="flex flex-row items-center h-20 p-4 justify-between w-full bg-white dark:bg-black border-b dark:border-stone-800 border-stone-200">
                     <p className="dark:text-white text-2xl font-bold">Dashboard</p>
-                    <div className="flex flex-row space-x-4">
-                        <Input
-                            placeholder="Search"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            startContent={<MagnifyingGlassIcon width={20} height={20}/>}
-                        />
-
-                    </div>
                 </div>
-                <div className="flex flex-row w-full flex-grow h-[calc(100%-80px)] justify-between p-4 ">
-                    <div className=" dark:border-stone-800 dark:border relative w-1/2 rounded-lg bg-white dark:bg-stone-900 flex flex-col ">
+                <div className="flex md:flex-row flex-col w-full flex-grow md:h-[calc(100%-80px)] justify-between pr-4 py-4 md:p-4 ">
+                    <div className="mx-4 md:mx-0 dark:border-stone-800 dark:border relative max-h-screen w-[calc(100%-16px)] md:w-1/2 rounded-lg bg-white dark:bg-stone-900 flex flex-col ">
                         <div className="flex flex-row p-4 justify-between h-16">
-                            <h1 className="text-xl font-semibold">Upcoming Meetups</h1>
-                            <Button color="primary" variant="flat" isIconOnly onClick={() => router.push('/meetups/create')}>
+
+                            <h1 className="text-xl grow font-semibold ">Upcoming Meetups</h1>
+
+                            <Button className="ml-2" color="primary" variant="flat" isIconOnly onClick={() => router.push('/meetups/create')}>
                                 <PlusIcon width={20} height={20}/>
                             </Button>
                         </div>
-                        <div className={meetups.length > 0 ? "grid gap-4 h-[calc(100%-144px)] md:grid-cols-2 grid-cols-1 overflow-y-scroll lg:flex-col w-full p-4" : "p-4 flex h-full w-full justify-center items-center"}>
+                        <div className="p-4 pt-0 h-14 border-b border-stone-200 dark:border-none">
+                        <Input
+                            placeholder="Search"
+                            value={search}
+                            className="w-full "
+                            onChange={(e) => setSearch(e.target.value)}
+                            startContent={<MagnifyingGlassIcon width={20} height={20}/>}
+                        />
+                        </div>
+
+                        <div className={(meetups.length > 0 ? "grid gap-4 lg:grid-cols-2 grid-cols-1 w-full " : "p-4 pt-4 flex  w-full justify-center items-center") + " bg:stone-100 p-4 h-[calc(100%-200px)] overflow-y-scroll"}>
                             { meetups.map((meetup, index) => (
                                 <div key={index} className="w-full">
                                     <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={true} key={index}/>
@@ -69,16 +72,30 @@ export default function Dashboard() {
                                 </div></>
                             }
                             </div>
-                        <div className="absolute bottom-0 bg:stone-50 dark:bg-stone-950 border-t dark:border-stone-800 border-stone-200 w-full h-20 flex justify-start items-center">
+
+                        <div className="absolute bottom-0 bg:stone-50 z-10 dark:bg-stone-950 border-t dark:border-stone-800 border-stone-200 w-full h-20 flex justify-start items-center">
                             <Link onClick={() => router.push('/meetups')}>
                                 <p className="text-base font-semibold ml-4">View all meetups</p>
                             </Link>
                         </div>
                     </div>
-                    <div className="flex flex-col w-1/2 h-full pr-4">
-                        <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full ml-4 h-1/2  overflow-auto rounded-lg  bg-white flex flex-col">
+                    <div className="flex flex-col mt-4 mr-4 md:mr-0 w-full md:mt-0 md:w-1/2 h-full pr-4">
+                        <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full ml-4 h-full md:h-1/2 max-h-screen overflow-auto rounded-lg  bg-white flex flex-col">
                             <div className="flex flex-row p-4 justify-between">
-                                <h1 className="text-xl font-semibold">Recent Notifications</h1>
+                                <h1 className="lg:text-xl md:text-lg text-base font-semibold">Recent Notifications</h1>
+                                <Link onClick={() => router.push('/notifications')}>
+                                    <p className="text-base hidden lg:block font-semibold ml-4">View all notifications</p>
+                                    <p className="text-sm block lg:hidden font-semibold ml-4">View all</p>
+                                </Link>
+                            </div>
+                            <div className="p-4 pt-0 h-14">
+                                <Input
+                                    placeholder="Search"
+                                    value={search}
+                                    className="w-full "
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    startContent={<MagnifyingGlassIcon width={20} height={20}/>}
+                                />
                             </div>
                             <div className="flex flex-col w-full p-4 overflow-y-scroll">
                                 { notifications.map((notification, index) => (
@@ -86,7 +103,7 @@ export default function Dashboard() {
                                 ))}
                             </div>
                         </div>
-                        <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full mt-4 ml-4 h-1/2  overflow-auto rounded-lg  bg-white flex flex-col">
+                        <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full mt-4 ml-4 md:h-1/2 h-full overflow-auto rounded-lg  bg-white flex flex-col">
                             <div className="flex flex-row p-4 justify-between">
                                 <h1 className="text-xl font-semibold">IDeas ?</h1>
                             </div>

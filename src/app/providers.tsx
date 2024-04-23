@@ -97,7 +97,7 @@ export function Providers({children}: { children: React.ReactNode }) {
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
                     <userContext.Provider value={{user, updateUser}}>
                         {children}
-                        <Next13ProgressBar height="4px" color="#0A2FFF" options={{ showSpinner: true }} showOnShallow />
+                        <Next13ProgressBar height="4px" color="#0A2FFF" options={{ showSpinner: false }} showOnShallow />
                     </userContext.Provider>
                 </GoogleOAuthProvider>
             </NextThemesProvider>
