@@ -85,4 +85,5 @@ const defaultUser = new User({
     password: "password",
 });
 
-export {User, defaultUser, ReadNotification};
+export {User, defaultUser};
+export type {ReadNotification};
