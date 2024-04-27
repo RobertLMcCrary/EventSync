@@ -1,14 +1,14 @@
 "use client";
-import { useContext, useState } from 'react';
+import {Suspense, useContext, useState} from 'react';
 import { userContext } from '@/app/providers';
 import { User } from '@/types';
 import useSession from "@/app/components/utils/sessionProvider";
 import { useRouter } from 'next13-progressbar';
 import { CheckIcon } from '@heroicons/react/24/solid';
 import { useSearchParams } from 'next/navigation';
-import {Button, Avatar, Input, Textarea} from '@nextui-org/react';
+import {Button, Avatar, Input, Textarea, Skeleton} from '@nextui-org/react';
 
-export default function GetStarted(){
+function GetStartedComponent(){
     const {user, updateUser} = useContext(userContext);
     const [updatedUser, setUpdatedUser] = useState<User | null>(null);
     const {session, status} = useSession();
@@ -128,6 +128,20 @@ export default function GetStarted(){
         </div>
 
     )
+}
 
-
+export default function GetStarted() {
+    return (
+        <Suspense fallback={
+            <div className="w-[400px] h-[400px]">
+                <Skeleton className="w-full h-5 mb-1" />
+                <Skeleton className="w-[4/5] h-5 mb-1" />
+                <Skeleton className="w-full h-5 mb-4" />
+                <Skeleton className="w-full h-5 mb-1" />
+                <Skeleton className="w-full h-5" />
+            </div>
+        }>
+            <GetStartedComponent />
+        </Suspense>
+    );
 }
