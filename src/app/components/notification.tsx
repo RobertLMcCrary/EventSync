@@ -6,7 +6,7 @@ import getNotificationData from "@/app/components/utils/getNotificationData";
 import {useRouter} from "next13-progressbar";
 
 
-export default function NotificationCard({notification, initiator, meetup} : {notification: AppNotification | null, initiator: User | null, meetup: Meetup | null}){
+export default function NotificationCard({notification, initiator, meetup, onClick} : {notification: AppNotification | null, initiator: User | null, meetup: Meetup | null, onClick: (notificationID: string) => void}){
     const router = useRouter();
     let data;
     if (!notification){
@@ -63,7 +63,7 @@ export default function NotificationCard({notification, initiator, meetup} : {no
                         }
 
                         {notification?
-                        <Button onClick={() => router.push(notification.buttonHREF)} className="mb-1" variant="light" color="primary" size="sm">
+                        <Button onClick={() => onClick(notification._id)} className="mb-1" variant="light" color="primary" size="sm">
                             <p>View</p>
                         </Button> :
                         <Skeleton className="w-1/5 rounded-md h-4 mb-1.5"/>}

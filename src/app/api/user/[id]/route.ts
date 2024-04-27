@@ -42,23 +42,25 @@ export async function PUT(request: NextRequest, { params } : {params: {id: strin
     }
 
     const updateData = await request.json(); // Get user data from request body
-    if (updateData['$set']['password']) {
-        updateData['$set']['password'] = await hashPassword(updateData['$set']['password']);
-    }
 
-    if (updateData['$set']['username']) {
-        const user = await getUser({username: updateData['$set']['username']});
-        if (user) {
-            return NextResponse.json({error: 'Username already exists'});
+    if ('$set' in updateData['update']) {
+        if ('password' in updateData['update']['$set']) {
+            updateData['update']['$set']['password'] = await hashPassword(updateData['update']['$set']['password']);
+        }
+        if ('username' in updateData['update']['$set']) {
+            const user = await getUser({username: updateData['update']['$set']['username']});
+            if (user) {
+                return NextResponse.json({error: 'Username already exists'});
+            }
+        }
+        if ('email' in updateData['update']['$set']) {
+            const user = await getUser({email: updateData['update']['$set']['email']});
+            if (user) {
+                return NextResponse.json({error: 'Email already exists'});
+            }
         }
     }
 
-    if (updateData['$set']['email']) {
-        const user = await getUser({email: updateData['$set']['email']});
-        if (user) {
-            return NextResponse.json({error: 'Email already exists'});
-        }
-    }
 
     const user = await getUser({userID: params.id});
 

@@ -12,37 +12,45 @@ export default function MeetupCard({ meetup, creator, small }: { meetup: Meetup 
     const router = useRouter();
 
 
-    console.log(new Date(meetup?.date.toLocaleString()).toLocaleString());
 
     if (small){
         return (
-            <Card className="w-full aspect-square rounded-xl">
-                <div className="overflow-hidden">
-                    <CardHeader className="absolute bg-white/30 rounded-t-lg z-10 backdrop-blur w-full dark:bg-black/30 flex-col items-start">
-                        <p className="text-base text-black/30 dark:text-white/60 uppercase font-bold">{meetup?.title}</p>
-                        <h4 className="dark:text-stone-100/50 text-stone-800/50 font-medium text-tiny">{meetup?.description} <span className="font-bold ml-4">{new Date(meetup?.date.toLocaleString()).toLocaleString()}</span></h4>
-                    </CardHeader>
-                </div>
-                <Image
-                    removeWrapper
-                    alt={meetup?.title}
-                    className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
-                    src={meetup?.image}
-                />
-                <div className="overflow-hidden ">
-                <CardFooter className="absolute rounded-none backdrop-blur w-full bg-white/50 dark:bg-black/50 bottom-0 z-10 justify-between">
-                    <div>
-                        <div className="flex flex-row items-center">
-                            <Avatar src={creator?.avatar} isBordered size="sm" className="w-5 h-5 mr-2 "/>
-                            <p className="text-tiny dark:text-white/70 text-stone-800/70 font-bold ml-1">{creator?.username}</p>
-                        </div>
+             !meetup ? <Skeleton className="w-full aspect-square rounded-lg"/> :
+
+                <Card className="w-full aspect-square rounded-xl">
+                    <div className="overflow-hidden">
+                        <CardHeader
+                            className="absolute bg-white/30 rounded-t-lg z-10 backdrop-blur w-full dark:bg-black/30 flex-col items-start">
+                            <p className="text-base text-black/30 dark:text-white/60 uppercase font-bold">{meetup?.title}</p>
+                            <h4 className="dark:text-stone-100/50 text-stone-800/50 font-medium text-tiny">{meetup?.description}
+                                <span
+                                    className="font-bold ml-4">{new Date(meetup.date.toLocaleString()).toLocaleString()}</span>
+                            </h4>
+                        </CardHeader>
                     </div>
-                    <Button onClick={() => router.push('/meetups/'+meetup?._id)} className="text-tiny" color="primary" radius="full" size="sm">
-                        View
-                    </Button>
-                </CardFooter>
-                </div>
-            </Card>
+                    <Image
+                        removeWrapper
+                        alt={meetup?.title}
+                        className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
+                        src={meetup?.image}
+                    />
+                    <div className="overflow-hidden ">
+                        <CardFooter
+                            className="absolute rounded-none backdrop-blur w-full bg-white/50 dark:bg-black/50 bottom-0 z-10 justify-between">
+                            <div>
+                                <div className="flex flex-row items-center">
+                                    <Avatar src={creator?.avatar} isBordered size="sm" className="w-5 h-5 mr-2 "/>
+                                    <p className="text-tiny dark:text-white/70 text-stone-800/70 font-bold ml-1">{creator?.username}</p>
+                                </div>
+                            </div>
+                            <Button onClick={() => router.push('/meetups/' + meetup?._id)} className="text-tiny"
+                                    color="primary" radius="full" size="sm">
+                                View
+                            </Button>
+                        </CardFooter>
+                    </div>
+                </Card>
+
         )
     }
 

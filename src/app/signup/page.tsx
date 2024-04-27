@@ -187,7 +187,11 @@ function SignupComponent() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('token')} `
             },
-            body: JSON.stringify({ "$set" : { verified: true } }),
+            body: JSON.stringify({
+                update: {
+                    $set: {verified: true}
+                }
+            }),
 
         }).then((res) => {
             setIsVerificationLoading(false);

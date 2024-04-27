@@ -34,21 +34,31 @@ export default function GetStarted(){
         if (!updatedUser) return;
         if (!user) return;
         setIsLoading(true);
+
+        const updateData: any = {
+            update: {
+                $set: {
+                    bio: updatedUser.bio,
+                    location: updatedUser.location,
+                    avatar: updatedUser.avatar,
+                }
+            }
+        }
+
+        if (updatedUser.username != user.username){
+            updateData["update"]["$set"]["username"] = updatedUser.username;
+        }
+        if (user.password.length == 0){
+            updateData["update"]["$set"]["password"] = updatedUser.password;
+        }
+
         fetch(`/api/user/${updatedUser._id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.token}`
             },
-            body: JSON.stringify({
-                $set: {
-                    bio: updatedUser.bio,
-                    location: updatedUser.location,
-                    avatar: updatedUser.avatar,
-                    password: (user.password.length > 0) ? user.password : updatedUser.password,
-                    username: (updatedUser.username !== user.username) ? updatedUser.username : user.username,
-                }
-            })
+            body: JSON.stringify(updateData)
         }).then((res) => {
             setIsLoading(false);
             if (res.ok) {
@@ -71,7 +81,7 @@ export default function GetStarted(){
         <div className="flex flex-col items-center justify-center h-screen w-screen bg-white dark:bg-black">
             <div className="flex flex-col justify-items-start p-8">
                 <h1 className="text-3xl font-bold mb-8 ">Welcome! Let&apos;s create your profile</h1>
-                <div className={user?.password ? "hidden" : "flex flex-row justify-between mb-6 items-center w-full"}>
+                <div className={user?.password && user?.username ? "hidden" : "flex flex-row justify-between mb-6 items-center w-full"}>
                     <div className="flex flex-col w-1/2">
                         <h1 className="text-lg font-semibold mb-4 ">Username</h1>
                         <Input placeholder="Username" size="lg" className="w-full" value={updatedUser?.username} onChange={(e) => setUpdatedUser({...updatedUser, username: e.target.value})}/>

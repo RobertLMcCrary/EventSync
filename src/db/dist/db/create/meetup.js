@@ -46,7 +46,7 @@ function createMeetup(meetup) {
             switch (_a.label) {
                 case 0:
                     meetups = connect_1.db.collection('meetups');
-                    return [4 /*yield*/, (0, user_1.updateUser)(meetup.creator, { $push: { meetups: meetup._id } })];
+                    return [4 /*yield*/, (0, user_1.updateUser)(meetup.creator, { update: { $push: { meetups: meetup._id } } })];
                 case 1:
                     _a.sent();
                     return [4 /*yield*/, meetups.insertOne(meetup.toJSON())];

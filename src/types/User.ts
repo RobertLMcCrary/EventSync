@@ -2,6 +2,12 @@ import {generateSnowflake} from "../db/utils/snowflake";
 import {GoogleAuth} from "./GoogleAuth";
 
 // TODO: Decide on the fields for a User
+
+interface ReadNotification {
+    notificationID: string;
+    read: boolean;
+}
+
 interface UserParams {
     username: string;
     email: string;
@@ -9,7 +15,7 @@ interface UserParams {
     meetups?: string[];
     _id?: string;
     avatar?: string;
-    notifications?: string[];
+    notifications?: ReadNotification[];
     theme?: "light" | "dark" | "system";
     verified?: boolean;
     friends?: string[];
@@ -26,7 +32,7 @@ class User {
     password: string;
     meetups: string[]; // Array of meetup ids
     avatar: string; // URL to the user's avatar
-    notifications: string[]; // Array of notification ids
+    notifications: ReadNotification[]; // Array of notification ids
     theme: "light" | "dark" | "system" = "system"; // User's preferred theme
     verified: boolean; // Whether the user has verified their email
     friends: string[]; // Array of user ids
@@ -79,4 +85,4 @@ const defaultUser = new User({
     password: "password",
 });
 
-export {User, defaultUser};
+export {User, defaultUser, ReadNotification};

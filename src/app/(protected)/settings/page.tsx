@@ -41,7 +41,11 @@ export default function Settings() {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + session.session.token,
             },
-            body: JSON.stringify({$set: {googleAccount: null}}),
+            body: JSON.stringify({
+                update: {
+                    $set: {googleAccount: null}
+                }
+            }),
         }).then((res) => {
             if (!res.ok) {
                 setGoogleError("An error occurred while disconnecting your Google account");
@@ -85,13 +89,15 @@ export default function Settings() {
         setIsLoading(true);
 
         const changes = {
-            $set: {
-                interests: updatedUser.interests,
-                theme: updatedUser.theme,
-                email: updatedUser.email,
-                username: updatedUser.username,
-                verified: updatedUser.verified,
-                avatar: updatedUser.avatar,
+            update: {
+                $set: {
+                    interests: updatedUser.interests,
+                    theme: updatedUser.theme,
+                    email: updatedUser.email,
+                    username: updatedUser.username,
+                    verified: updatedUser.verified,
+                    avatar: updatedUser.avatar,
+                }
             }
         }
 
@@ -146,7 +152,11 @@ export default function Settings() {
                             'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + session.session.token,
                         },
-                        body: JSON.stringify({$set: {googleAccount: null}}),
+                        body: JSON.stringify({
+                            update: {
+                                $set: {googleAccount: null}
+                            }
+                        }),
                     });
                     setGoogleError("An error occurred while fetching your Google account. Please reconnect.");
 
@@ -160,13 +170,7 @@ export default function Settings() {
     }
 
   return (
-      <div className="flex flex-row bg-neutral-100 dark:bg-black h-screen w-screen">
-          <Sidebar user={user} active="settings"/>
-          <div className="relative flex flex-col h-screen w-full">
-              <div className="dark:bg-stone-900 w-full p-4">
-                  <h1 className="text-2xl font-bold">Settings</h1>
-              </div>
-
+      <div className="w-full h-[calc(100vh-80px)] flex flex-col">
               <Tabs variant="solid" className=" relative w-full p-2 justify-end flex border-b dark:border-stone-800" aria-label="Tabs variants">
                   <Tab key="Account" title="Account">
                       <div className="flex flex-col ">
@@ -282,11 +286,10 @@ export default function Settings() {
               <div className="w-full p-4  absolute bottom-0 flex items-center justify-between flex-row  dark:bg-stone-900">
                   <p className="dark:text-stone-400">Please make sure to save your changes !</p>
                   <div className="flex flex-col">
-                  <Button onClick={submitChanges} isLoading={isLoading} color="success" className="w-auto text-white ">Save</Button>
+                      <Button onClick={submitChanges} isLoading={isLoading} color="success" className=" ">Save</Button>
                       <p className={updateError ? "text-red-500 mt-1" : "hidden"}>{updateError}</p>
                   </div>
               </div>
           </div>
-      </div>
   )
 }

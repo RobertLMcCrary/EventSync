@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import { getNotification } from "@/db/read/notification";
+import { updateNotification } from "@/db/update/notification";
 
 import {headers} from "next/headers";
 import verifyJWT from "@/app/api/utils/verifyJWT";
@@ -41,6 +42,8 @@ export async function PUT(request: NextRequest, { params } : {params: {id: strin
 
 
     // TODO: Implement updateNotification
+    await updateNotification(params.id, request.body);
+    return NextResponse.json({success: true});
 }
 
 export async function DELETE(request: NextRequest, { params } : {params: {meetup: string}}) {
