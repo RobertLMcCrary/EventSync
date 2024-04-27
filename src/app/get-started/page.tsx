@@ -84,23 +84,23 @@ export default function GetStarted(){
                 <div className={user?.password && user?.username ? "hidden" : "flex flex-row justify-between mb-6 items-center w-full"}>
                     <div className="flex flex-col w-1/2">
                         <h1 className="text-lg font-semibold mb-4 ">Username</h1>
-                        <Input placeholder="Username" size="lg" className="w-full" value={updatedUser?.username} onChange={(e) => setUpdatedUser({...updatedUser, username: e.target.value})}/>
+                        <Input placeholder="Username" size="lg" className="w-full" value={updatedUser?.username} onChange={(e) => setUpdatedUser({...updatedUser, username: e.target.value} as User)}/>
                     </div>
 
                     <div className="fle flex-col w-1/2 ml-4">
                         <h1 className="text-lg font-semibold mb-4 ">Password</h1>
-                        <Input placeholder="Password" size="lg" className="w-full" value={updatedUser?.password} onChange={(e) => setUpdatedUser({...updatedUser, password: e.target.value})}/>
+                        <Input placeholder="Password" size="lg" className="w-full" value={updatedUser?.password} onChange={(e) => setUpdatedUser({...updatedUser, password: e.target.value} as User)}/>
                     </div>
                 </div>
                 <h1 className="text-lg font-semibold mb-4 ">Choose your avatar</h1>
                 <div className="flex flex-row justify-between items-center ">
                     <Avatar src={updatedUser?.avatar} size="lg" className="w-44 h-44 rounded-full "/>
                     <div className="flex flex-col ml-8">
-                    <Input endContent={<CheckIcon onClick={(e) => setUpdatedUser({...updatedUser, avatar: avatar})} className="w-6 h-6 text-green-500"/>} onChange={(e) => setAvatar(e.target.value)} placeholder="Avatar URL" size="lg" className="w-auto mb-4" />
+                    <Input endContent={<CheckIcon onClick={(e) => setUpdatedUser({...updatedUser, avatar: avatar} as User)} className="w-6 h-6 text-green-500"/>} onChange={(e) => setAvatar(e.target.value)} placeholder="Avatar URL" size="lg" className="w-auto mb-4" />
                         <p className="text-base font-bold mb-2 ml-0.5 dark:text-stone-400">Or choose a default image</p>
                         <div className="flex flex-row">
                             {defaultAvatars.map((avatar, index) => (
-                                <Avatar isBordered={updatedUser?.avatar == avatar} key={index} src={avatar} size="md" className="w-12 h-12 rounded-full m-2" onClick={() => setUpdatedUser({...updatedUser, avatar})}/>
+                                <Avatar isBordered={updatedUser?.avatar == avatar} key={index} src={avatar} size="md" className="w-12 h-12 rounded-full m-2" onClick={() => setUpdatedUser({...updatedUser, avatar} as User)}/>
                             ))}
                         </div>
                     </div>
@@ -108,13 +108,13 @@ export default function GetStarted(){
                 <div className="flex flex-row justify-between mt-8">
                     <div className="flex flex-col w-1/2">
                         <h1 className="text-lg font-semibold mb-4 ">Set your Location</h1>
-                        <Input placeholder="Enter your location" size="lg" className="w-full" value={updatedUser?.location} onChange={(e) => setUpdatedUser({...updatedUser, location: e.target.value})}/>
+                        <Input placeholder="Enter your location" size="lg" className="w-full" value={updatedUser?.location} onChange={(e) => setUpdatedUser({...updatedUser, location: e.target.value} as User)}/>
                         <Button isDisabled={!updatedUser?.avatar || !updatedUser?.username || !updatedUser?.password || !updatedUser?.location || !updatedUser?.bio} color="primary" className="mt-4" onClick={submit} isLoading={isLoading}>Complete</Button>
                     </div>
                     <div className="flex flex-col w-1/2 ml-4">
                         <h1 className="text-lg font-semibold mb-4 ">Bio</h1>
                         <Textarea
-                            onChange={(e) => setUpdatedUser({...updatedUser, bio: e.target.value})}
+                            onChange={(e) => setUpdatedUser({...updatedUser, bio: e.target.value} as User)}
                             label="Bio"
                             value={updatedUser?.bio}
                             placeholder="Describe yourself"
