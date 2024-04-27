@@ -120,7 +120,7 @@ export default function Home() {
 
             <section className="flex text-center items-center justify-center mt-14">
                 <div>
-                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-3xl text-center font-bold mt-10">Don't have an account?</h1>
+                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-3xl text-center font-bold mt-10">Don&apos;t have an account?</h1>
                     <button data-aos="fade-left" data-aos-duration="1000" onClick={() => router.push("/signup")} className=" m-10 text-2xl text-center font-bold w-48 p-4 bg-blue-500 hover:bg-blue-700 transition-colors duration-300  rounded-md">Signup</button>
                 </div>
             </section>
