@@ -25,9 +25,8 @@ export async function POST(request: NextRequest) {
     const meetupData = await request.json(); // Get user data from request body
     meetupData.date = new Date(meetupData.date);
     const meetup = new Meetup(meetupData); // Create new user object from data
-    const updatedInvited = meetup.invited.copyWithin(0, meetup.invited.length);
-    meetup.invited.map(async (attendee: string) => {
-        console.log(attendee);
+
+    await Promise.all(meetup.invited.map(async (attendee: string) => {
         if (attendee.includes('@')) {
             const user = await getUser({email: attendee});
             if (!user) {
@@ -49,19 +48,21 @@ export async function POST(request: NextRequest) {
                 });
 
             } else {
-                let index = updatedInvited.indexOf(attendee);
+                console.log(attendee);
+                let index = meetup.invited.indexOf(attendee);
+                console.log(index);
                 if (index !== -1) {
-                    updatedInvited.splice(index, 1);
+                    meetup.invited[index] = user._id
+                    console.log(meetup.invited);
                 }
-                updatedInvited.push(user._id);
                 await notifyUser(meetup, user)
             }
         } else {
             const user = await getUser({userID: attendee});
             await notifyUser(meetup, user)
         }
-    });
-    meetup.invited = updatedInvited;
+    }));
+    console.log(meetup);
     await createMeetup(meetup); // Create meetup in database
     return NextResponse.json(meetup.toJSON()); // Return meetup data as JSON
 }

@@ -103,8 +103,10 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
                 'Authorization': `Bearer ${session.session.token}`
             },
             body: JSON.stringify({
-                $push: {
-                    meetups: meetup._id
+                update: {
+                    $push: {
+                        meetups: meetup._id
+                    }
                 }
             })
         });
@@ -168,12 +170,6 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
 
 
     return (
-        <div className="flex flex-row bg-neutral-100 dark:bg-black h-screen w-screen">
-            <Sidebar user={user} active="meetups"/>
-            <div className="flex flex-col w-full h-full">
-                <div className="flex flex-row p-4 justify-between items-center dark:border-stone-800 dark:bg-stone-950 border-b">
-                    <h1 className="text-2xl font-bold ">Meetup Invitation</h1>
-                </div>
                 <div className="flex justify-center items-center h-full w-full">
                     <div className="flex flex-col rounded-md w-96 h-auto p-4">
                         { meetup && meetupCreator ? <><h1 className="text-lg text-center flex flex-row items-center w-full justify-center">
@@ -198,7 +194,5 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
                             : null}
                     </div>
                 </div>
-            </div>
-        </div>
     )
 }

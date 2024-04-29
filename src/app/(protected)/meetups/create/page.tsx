@@ -2,7 +2,7 @@
 import {defaultUser, User} from "@/types";
 import Sidebar from "@/app/components/sidebar";
 import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
-import {useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import CreateMeetupStep1 from "@/app/components/create-meetup/createMeetupStep1";
 import CreateMeetupStep2 from "@/app/components/create-meetup/createMeetupStep2";
 import CreateMeetupStep3 from "@/app/components/create-meetup/createMeetupStep3";
@@ -47,7 +47,7 @@ export default function CreateMeetup() {
                     meetup: {
                         title: name,
                         description: description,
-                        date: dateTime,
+                        date: dateTime.toDate(),
                         location: location,
                         invited: attendees.map((user) => user.email)
                     }
@@ -126,30 +126,20 @@ export default function CreateMeetup() {
         router.push("/login");
     }
 
-
-
     function changeStep(){
-        setStep((step) => step + 1);
+        setStep((step: number) => step + 1);
     }
 
     return (
-        <div className="flex flex-row bg-neutral-100 dark:bg-black h-screen w-screen">
-            <Sidebar user={user} active="notifications"/>
-            <div className="flex flex-col h-screen w-full">
-                <div className="flex flex-row p-4 justify-between items-center dark:border-stone-800 dark:bg-stone-950 border-b">
-                    <h1 className="text-2xl font-bold ">Create a Meetup</h1>
-                    <Breadcrumbs>
-                        {step > 0 ? <BreadcrumbItem className="text-sm" onClick={()=>setStep(1)}>Name & Description</BreadcrumbItem> : null}
-                        { step > 1 ? <BreadcrumbItem onClick={()=>setStep(2)}>Location & Time</BreadcrumbItem> : null}
-                        { step > 2 ? <BreadcrumbItem onClick={()=>setStep(2)}>Attendees</BreadcrumbItem> : null}
-                    </Breadcrumbs>
-                </div>
-                <div className=" flex justify-center items-center h-full w-full">
-                    {step == 1 ? <CreateMeetupStep1 name={name} description={description} setName={setName} setDescription={setDescription} changeStep={changeStep}/> : null}
-                    {step == 2 ? <CreateMeetupStep2 location={location} dateTime={dateTime} changeStep={changeStep} setLocation={setLocation} setDateTime={setDateTime}/> : null}
-                    {step == 3 ? <CreateMeetupStep3 attendees={attendees} createMeetup={createMeetup} meetupCreationLoading={meetupCreationLoading} userEmail={userEmail} setAttendees={setAttendees} friends={friends}/> : null}
-                </div>
-            </div>
+        <div className=" flex justify-center items-center h-full w-full">
+            <Breadcrumbs className="top-7 right-5 absolute">
+                {step > 0 ? <BreadcrumbItem className="text-sm" onClick={()=>setStep(1)}>Name & Description</BreadcrumbItem> : null}
+                { step > 1 ? <BreadcrumbItem onClick={()=>setStep(2)}>Location & Time</BreadcrumbItem> : null}
+                { step > 2 ? <BreadcrumbItem onClick={()=>setStep(2)}>Attendees</BreadcrumbItem> : null}
+            </Breadcrumbs>
+            {step == 1 ? <CreateMeetupStep1 name={name} description={description} setName={setName} setDescription={setDescription} changeStep={changeStep}/> : null}
+            {step == 2 ? <CreateMeetupStep2 location={location} dateTime={dateTime} changeStep={changeStep} setLocation={setLocation} setDateTime={setDateTime}/> : null}
+            {step == 3 ? <CreateMeetupStep3 attendees={attendees} createMeetup={createMeetup} meetupCreationLoading={meetupCreationLoading} userEmail={userEmail} setAttendees={setAttendees} friends={friends}/> : null}
         </div>
     )
 }

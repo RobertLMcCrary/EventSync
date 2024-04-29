@@ -29,7 +29,8 @@ export default function useDashboardState() {
         session,
         status,
         knownMeetups,
-        setKnownMeetups
+        setKnownMeetups,
+        updateUser
     };
 
 }

@@ -177,6 +177,8 @@ export default function Home() {
                 <div>
                     <h1 data-aos="fade-right" data-aos-duration="1000" className="mb-4 text-3xl text-center text-black dark:text-white font-bold mt-10">Don't have an account?</h1>
                     <Button color="primary" data-aos="fade-left" data-aos-duration="1000" onClick={() => router.push("/signup")}>Signup</Button>
+
+                
                 </div>
             </section>
 

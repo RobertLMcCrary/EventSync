@@ -64,7 +64,7 @@ function createNotification(notification) {
                         case 13: return [3 /*break*/, 5];
                     }
                     return [3 /*break*/, 7];
-                case 1: return [4 /*yield*/, (0, user_1.updateUser)(notification.receiver, { "$push": { "notifications": notification._id } })];
+                case 1: return [4 /*yield*/, (0, user_1.updateUser)(notification.receiver, { update: { "$push": { "notifications": { "notificationID": notification._id, "read": false } } } })];
                 case 2:
                     _b.sent();
                     return [3 /*break*/, 8];
@@ -76,7 +76,7 @@ function createNotification(notification) {
                     meetup_2.attendees.forEach(function (attendee) {
                         if (attendee == meetup_2.creator)
                             return;
-                        (0, user_1.updateUser)(attendee, { "$push": { "notifications": notification._id } });
+                        (0, user_1.updateUser)(attendee, { update: { "$push": { "notifications": { "notificationID": notification._id, "read": false } } } });
                     });
                     return [3 /*break*/, 8];
                 case 5: return [4 /*yield*/, (0, meetup_1.getMeetup)(notification.meetup)];
@@ -85,7 +85,7 @@ function createNotification(notification) {
                     if (!meetup2)
                         throw new Error("Meetup not found");
                     meetup2.attendees.forEach(function (attendee) {
-                        (0, user_1.updateUser)(attendee, { "$push": { "notifications": notification._id } });
+                        (0, user_1.updateUser)(attendee, { update: { "$push": { "notifications": { "notificationID": notification._id, "read": false } } } });
                     });
                     return [3 /*break*/, 8];
                 case 7: return [3 /*break*/, 8];

@@ -4,7 +4,7 @@ import {updateUser} from "../update/user";
 
 async function createMeetup(meetup: Meetup) {
     const meetups = db.collection('meetups');
-    await updateUser(meetup.creator, { $push: { meetups: meetup._id } });
+    await updateUser(meetup.creator, { update: { $push: { meetups: meetup._id } } });
 
     return await meetups.insertOne(meetup.toJSON());
 }

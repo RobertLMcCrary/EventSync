@@ -13,7 +13,7 @@ async function createNotification(notification: AppNotification) {
         case 4:
         case 5:
         case 6:
-            await updateUser(notification.receiver, {"$push": {"notifications": notification._id}});
+            await updateUser(notification.receiver, {update: {"$push": {"notifications": {"notificationID": notification._id, "read": false}}}});
             break;
         case 7:
         case 8:
@@ -23,7 +23,7 @@ async function createNotification(notification: AppNotification) {
             if (!meetup) throw new Error("Meetup not found");
             meetup.attendees.forEach((attendee: string) => {
                 if (attendee == meetup.creator) return;
-                updateUser(attendee, {"$push": {"notifications": notification._id}});
+                updateUser(attendee, {update: {"$push": {"notifications": {"notificationID": notification._id, "read": false}}}});
             });
             break;
         case 11:
@@ -32,7 +32,7 @@ async function createNotification(notification: AppNotification) {
             const meetup2 = await getMeetup(notification.meetup);
             if (!meetup2) throw new Error("Meetup not found");
             meetup2.attendees.forEach((attendee: string) => {
-                updateUser(attendee, {"$push": {"notifications": notification._id}});
+                updateUser(attendee, {update: {"$push": {"notifications": {"notificationID": notification._id, "read": false}}}});
             });
             break;
         default:

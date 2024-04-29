@@ -1,4 +1,4 @@
-import {Meetup, User, AppNotification} from '@/types';
+import {Meetup, User, AppNotification, ReadNotification} from '@/types';
 import {getUpcomingEvents} from "@/app/api/utils/eventFinder";
 
 interface fetchParams {
@@ -44,6 +44,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                         router.push('/login?redirect=/dashboard');
                         return;
                     }
+                    if (new Date().getTime() - new Date(meetup.date.toLocaleString()).getTime() > 0) return;
                     setMeetups((prev: any) => [...prev, meetup]);
                     setKnownMeetups((prev: any) => [...prev, meetup]);
                     if (knownUsers.find((user: User) => user._id == meetup.creator)) {
@@ -67,8 +68,9 @@ export default function fetchData({session, setKnownUsers, user, setNotification
 
     if (user.notifications && notifications.includes(null)) {
         setNotifications([]);
-        user.notifications.forEach((notificationID: string) => {
-            fetch(`/api/notification/${notificationID}`, {
+        user.notifications.forEach((notificationObj: ReadNotification) => {
+            if (notificationObj.read) return;
+            fetch(`/api/notification/${notificationObj.notificationID}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

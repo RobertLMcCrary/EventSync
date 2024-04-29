@@ -4,7 +4,7 @@ import { Session } from "@/types";
 import Cookies from 'js-cookie';
 import {usePathname} from "next/navigation";
 
-const PROTECTED_ROUTES = ['/dashboard', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
+const PROTECTED_ROUTES = ['/dashboard', '/get-started', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
 export default function useSession(){
     const [session, setSession] = useState<Session>(new Session(null, null)); // session = userID
     const [status, setStatus] = useState<'loading' | 'done' | 'error'>('loading');

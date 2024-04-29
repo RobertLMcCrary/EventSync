@@ -4,6 +4,7 @@ import { updateUser } from "@/db/update/user";
 import { deleteUser } from "@/db/delete/user";
 import {headers} from "next/headers";
 import verifyJWT from "@/app/api/utils/verifyJWT";
+import hashPassword from "@/app/api/utils/hashPassword";
 
 
 export async function GET(request: NextRequest, { params } : {params: {id: string}}) {
@@ -41,6 +42,26 @@ export async function PUT(request: NextRequest, { params } : {params: {id: strin
     }
 
     const updateData = await request.json(); // Get user data from request body
+
+    if ('$set' in updateData['update']) {
+        if ('password' in updateData['update']['$set']) {
+            updateData['update']['$set']['password'] = await hashPassword(updateData['update']['$set']['password']);
+        }
+        if ('username' in updateData['update']['$set']) {
+            const user = await getUser({username: updateData['update']['$set']['username']});
+            if (user) {
+                return NextResponse.json({error: 'Username already exists'});
+            }
+        }
+        if ('email' in updateData['update']['$set']) {
+            const user = await getUser({email: updateData['update']['$set']['email']});
+            if (user) {
+                return NextResponse.json({error: 'Email already exists'});
+            }
+        }
+    }
+
+
     const user = await getUser({userID: params.id});
 
     if (!user) {

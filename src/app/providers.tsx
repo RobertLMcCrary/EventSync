@@ -20,7 +20,7 @@ const userContext = createContext<UserWithUpdate>({
     user: null,
     updateUser: async () => {},
 });
-const PROTECTED_ROUTES = ['/dashboard', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
+const PROTECTED_ROUTES = ['/dashboard', '/get-started', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
 export function Providers({children}: { children: React.ReactNode }) {
     const router = useRouter();
 
@@ -97,7 +97,7 @@ export function Providers({children}: { children: React.ReactNode }) {
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
                     <userContext.Provider value={{user, updateUser}}>
                         {children}
-                        <Next13ProgressBar height="4px" color="#0A2FFF" options={{ showSpinner: true }} showOnShallow />
+                        <Next13ProgressBar height="4px" color="#0A2FFF" options={{ showSpinner: false }} showOnShallow />
                     </userContext.Provider>
                 </GoogleOAuthProvider>
             </NextThemesProvider>
