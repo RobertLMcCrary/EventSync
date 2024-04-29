@@ -4,6 +4,7 @@ import { Meetup, defaultMeetup, User, defaultUser } from "@/types";
 import MeetupCard from "@/app/components/meetupCard";
 import { useState, useEffect } from "react";
 import { useRouter } from "next13-progressbar"
+import { useTheme } from "next-themes";
 
 //AOS - animate on scroll library
 import AOS from 'aos'
@@ -21,6 +22,7 @@ import {
     CardHeader,
     CardBody,
     NavbarItem,
+    Switch
 } from "@nextui-org/react"
 
 //team member object for cards
@@ -32,8 +34,20 @@ type TeamMember = {
 function About() {
     const router = useRouter()
 
+    const { theme, setTheme } = useTheme()
+
+    const currentTheme = theme
+
+    const toggleTheme = () => {
+        if (currentTheme == 'light') {
+            setTheme('dark')
+        }
+        if (currentTheme == 'dark') {
+            setTheme('light')
+        }
+    }
+
     useEffect(() => {
-        //initialize animate on scroll library
         AOS.init()
     })
 
@@ -69,23 +83,44 @@ function About() {
     ];
 
     return (
-        <div className="h-[100vh] w-full">
-            <Navbar maxWidth="full">
+        <div className="bg-white dark:bg-black">
+            <Navbar isBlurred maxWidth="full">
                 <NavbarContent justify="start">
                     <NavbarBrand>
-                        <Image
-                            src="/sm-dark-logo.png"
-                            width={60}
-                            height={60}
-                            alt="Logo"
-                            className="max-h-20 px-[-10px] m-[-10px]"
-                        />
+                        {currentTheme === 'dark' ? (
+                            <Image
+                                src="/sm-dark-logo.png"
+                                width={60}
+                                height={60}
+                                alt="Logo"
+                                className="max-h-20 px-[-10px] m-[-10px]"
+                            />
+                        ) : (
+                            <Image
+                                src="/sm-logo.png"
+                                width={60}
+                                height={60}
+                                alt="Logo"
+                                className="max-h-20 px-[-10px] m-[-10px]"
+                            />
+                        )}
                         <h1>EventSync</h1>
                     </NavbarBrand>
                 </NavbarContent>
+                <NavbarContent justify="center">
+                    <NavbarItem>
+                        <Switch
+                            defaultSelected
+                            size="lg"
+                            color="primary"
+                            onValueChange={toggleTheme}
+                        >
+                        </Switch>
+                    </NavbarItem>
+                </NavbarContent>
                 <NavbarContent justify="end">
                     <NavbarItem>
-                        <Link onClick={() => router.push("/")} className="cursor-pointer text-white">Home</Link>
+                        <Link onClick={() => router.push("/")} className="cursor-pointer text-black dark:text-white">Home</Link>
                     </NavbarItem>
                     <NavbarItem>
                         <Button onClick={() => router.push("/login")} color="primary">Login</Button>
@@ -97,10 +132,10 @@ function About() {
                 <h2 className="text-2xl font-bold mb-4">Our Team</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {teamMembers.map((member) => (
-                        <div data-aos="flip-down" data-aos-duration="1000" key={member.name} className="bg-slate-900 rounded-lg shadow p-6">
-                            <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
-                            <p className="text-lg mb-2">{member.role}</p>
-                        </div>
+                        <Card data-aos="flip-down" data-aos-duration="1000" key={member.name} className="bg-gray-200 dark:bg-slate-900 rounded-lg shadow-lg p-6">
+                            <CardHeader className="text-xl font-bold">{member.name}</CardHeader>
+                            <CardBody>{member.role}</CardBody>
+                        </Card>
                     ))}
                 </div>
             </section>
@@ -126,18 +161,28 @@ function About() {
                 </div>
             </section>
 
-            <section>
+            <section className="m-14 text-center">
                 <h1 className="text-3xl font-bold">Check us out on <a className="text-blue-600 underline" href="https://www.linkedin.com/company/event-sync/">LinkedIn!</a></h1>
-                <div className="flex justify-between">
-                    <Image data-aos="fade-down-right" width={100} height={100} src="/LinkedIn-logo-for-about-page.png" alt="LinkedIn Logo" />
-                    <Image data-aos="fade-up-left" width={100} height={100} src="/lg-dark-logo.png" alt="Logo" />
+                <div className="flex justify-between gap-[30px]">
+                    <img className="w-[40vw] h-auto" data-aos-delay="500" data-aos="fade-down-right" src="/LinkedIn-logo-for-about-page.png" alt="LinkedIn Logo" />
+                    {currentTheme === 'dark' ? (
+                        <img className="w-[40vw] h-auto" data-aos-delay="500" data-aos="fade-up-left" src="/lg-dark-logo.png" alt="Logo" />
+                    ) : (
+                        <div>
+                            <img className="w-[40vw]" data-aos-delay="500" data-aos="fade-up-left" src="/sm-logo.png" alt="Logo" />
+                        </div>
+                    )}
                 </div>
             </section>
 
-            <div className="flex justify-between">
-                <Image width={100} height={100} src="/lg-dark-logo.png" alt="logo" />
-                <Link onClick={() => router.push("/")} className="cursor-pointer text-white">Home</Link>
-            </div>
+            <section className="flex bg-gray-200 dark:bg-slate-900 justify-between border-solid border-slate-700 border-t-1">
+                {currentTheme === 'dark' ? (
+                    <Image width={100} height={100} src="/lg-dark-logo.png" alt="logo" />
+                ) : (
+                    <Image className="my-10" width={100} height={100} src="/lg-logo.png" alt="logo" />
+                )}
+                <Link onClick={() => router.push("/")} className="cursor-pointer text-black dark:text-white mr-4">Home</Link>
+            </section>
         </div>
     )
 }
