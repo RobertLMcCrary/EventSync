@@ -35,7 +35,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const {session, status} = useSession();
 
     useEffect(() => {
-        if (user && !meetup) {
+        if (status == "done" && user && !meetup) {
             fetch(`/api/meetup/` + params.id, {
                 method: "GET",
                 headers: {
@@ -93,8 +93,10 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                             className=" w-full h-1/4 object-cover rounded-t-xl"
                         /> : null
                     }
-                    <div className="relative flex flex-col p-4 md:p-10">
-                        <div className="md:flex items-center justify-between flex-row mb-1">
+
+                    <div className="flex flex-col md:flex-row md:gap-4 p-8 flex-grow">
+                        <div className="flex-1 h-full md:w-1/2 w-full md:justify-between flex flex-col">
+                            <div className="md:flex items-center justify-between flex-row mb-1">
                             <div className="flex flex-row">
                                 {meetup ?
                                     <h1 className="text-2xl font-semibold mr-4 ">
@@ -103,37 +105,20 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     : <Skeleton className="w-[3/5] h-5 rounded-md"/>
                                 }
 
-                            {meetupCreator ? <div className="flex flex-row items-center">
-                                    <Avatar
-                                        src={meetupCreator.avatar}
-                                        className="border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full mr-1"
-                                    />
-                                    <span className="text-sm font-semibold test-stone-800">{meetupCreator.username}</span>
-                                </div>
-                                : <div className="flex flex-row items-center">
-                                    <Skeleton className="w-6 h-6 mr-4 rounded-full"/>
-                                    <Skeleton className="w-20 h-4 rounded-lg"/>
-                                </div>
-                            }
+                                {meetupCreator ? <div className="flex flex-row items-center">
+                                        <Avatar
+                                            src={meetupCreator.avatar}
+                                            className="border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full mr-1"
+                                        />
+                                        <span className="text-sm font-semibold test-stone-800">{meetupCreator.username}</span>
+                                    </div>
+                                    : <div className="flex flex-row items-center">
+                                        <Skeleton className="w-6 h-6 mr-4 rounded-full"/>
+                                        <Skeleton className="w-20 h-4 rounded-lg"/>
+                                    </div>
+                                }
                             </div>
-                            <Button
-                                color="primary"
-                                variant="flat"
-                                isDisabled={false}
-                                className="hidden md:block"
-                                onClick={() => {
-                                    router.push("/meetups/" + params.id + "/edit");
-                                }}
-                            >
-                                Edit
-                            </Button>
                         </div>
-
-
-
-                    <div className="flex flex-col md:flex-row md:gap-4 flex-grow">
-                        <div className="flex-1 h-full md:w-1/2 w-full md:justify-between flex flex-col">
-
 
                                 {meetup ? <p>{meetup.description}</p> : <Skeleton className="w-[4/5] h-4 rounded-lg"/>}
 
@@ -150,7 +135,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     {meetup? <h2>{meetup.location}</h2> : <Skeleton className="w-[4/5] h-4 rounded-lg"/>}
                                 </div>
                             </div>
-                            <div className="mt-6">
+                            <div className="my-6">
                                 <div className="flex mb-1">
                                     <div className="flex -mr-1.5">
                                         <img
@@ -224,7 +209,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                 </Button>
                             </div>
                         </div>
-                        <div className="bg-gray-100 p-4 h-1/2 rounded-md overflow-y-scroll flex-1 w-full  md:w-1/2  md:mt-2 md:h-full">
+                        <div className="bg-stone-100 dark:bg-stone-950 p-4 h-1/2 rounded-xl overflow-y-scroll flex-1 w-full  md:w-1/2  md:mt-2 md:h-full">
                             <div className="flex w-full border-b border-gray-300 dark:border-gray-700 pb-3 mb-3">
                                 <h1 className="text-lg font-semibold">Announcements</h1>
                                 <div className="flex gap-1 ml-auto">
@@ -300,7 +285,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                             className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all"/>
                                     </button>
                                 </div>
-                                <div className="md:overflow-y-scroll md:h-[15rem] lg:h-[17rem]">
+                                <div className="md:overflow-y-scroll md:h-[15rem]">
                                     <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
                                         <div className="flex align-middle text-sm text-gray-700 mb-1">
                                             <img
@@ -348,7 +333,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                             </div>
                         </div>
                     </div>
-        </div>
+
 </CardBody>
 </Card>
 </div>

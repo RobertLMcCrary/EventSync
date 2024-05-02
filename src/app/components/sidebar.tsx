@@ -6,11 +6,13 @@ import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { User } from "@/types";
 import UserTooltip from "@/app/components/userTooltip";
-import { Button, Skeleton, Popover, PopoverTrigger, PopoverContent, Image, Tooltip } from "@nextui-org/react";
+import { Button, Badge, Skeleton, Popover, PopoverTrigger, PopoverContent, Image, Tooltip } from "@nextui-org/react";
 import { useRouter } from 'next13-progressbar';
+import { useEffect, useState } from "react";
 
 export default function Sidebar({ active, user, expanded, setExpanded } : { active: string, user: User | null, expanded: boolean, setExpanded: any}) {
     const router = useRouter();
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
 
     const sidebarItems = [
         "Dashboard",
@@ -19,6 +21,12 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
         "Friends",
         "Settings"
     ];
+
+    useEffect(() => {
+        if (user) {
+            setUnreadNotifications(user.notifications.filter(notification => !notification.read).length);
+        }
+    }, [user]);
 
     let asideClasses = " relative  h-screen hidden  w-24 flex-shrink-0 md:flex flex-col xl:w-64 border-r border:neutral-200 dark:border-neutral-800 bg-white dark:bg-black";
 
@@ -58,7 +66,7 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
                             className={(active == item.toString().toLowerCase() ? "bg-stone-100 dark:bg-stone-900 dark:hover:bg-stone-950 hover:bg-stone-50" : "xl:dark:hover:bg-stone-900 xl:hover:bg-stone-100") + " flex flex-row p-2 rounded-lg h-full xl:w-full"}>
                             <a className={expanded ? "hidden" : "block xl:hidden"} onClick={() => router.push('/'+item.toString().toLowerCase())}>
                                 {item == "Dashboard" && <Tooltip placement="right" color="primary" content="dashboard"><Squares2X2Icon className={(active == item.toString().toLowerCase() ? "dark:text-white text-black font-semibold" : "dark:text-stone-200 text-stone-800") + " w-6 h-6"}/></Tooltip>}
-                                {item == "Notifications" && <Tooltip placement="right" color="primary" content="notifications"><BellIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : " dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Tooltip>}
+                                {item == "Notifications" && <Tooltip placement="right" color="primary" content="notifications"><Badge content={unreadNotifications} placement="top-right" color="danger" isInvisible={unreadNotifications == 0}><BellIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : " dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Badge></Tooltip>}
                                 {item == "Meetups" && <Tooltip placement="right" color="primary" content="meetups"><MapIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : "dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Tooltip>}
                                 {item == "Friends" && <Tooltip placement="right" color="primary" content="friends"><UserGroupIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : "dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Tooltip>}
                                 {item == "Settings" && <Tooltip placement="right" color="primary" content="settings"><Cog6ToothIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : "dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Tooltip>}
@@ -73,8 +81,8 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
                                     <a onClick={() => router.push('/'+item.toString().toLowerCase())}><p
                                         className={(active == item.toString().toLowerCase() ? "font-semibold" : "dark:text-stone-400 text-stone-600 ") + " ml-4 text-sm mt-0.5 cursor-pointer"}> {item.toString()} </p>
                                     </a>
-                                    <div className="rounded-full flex w-auto p-1 h-4 bg-red-500 text-white text-center justify-items-center items-center mt-1  font-bold text-xs ">
-                                        <p>3</p>
+                                    <div className={(unreadNotifications == 0 || item != "Notifications" ? "hidden" : "") + " rounded-full flex w-auto p-1 h-4 bg-red-500 text-white text-center justify-items-center items-center mt-1  font-bold text-xs "}>
+                                        <p>{unreadNotifications}</p>
                                     </div>
 
 

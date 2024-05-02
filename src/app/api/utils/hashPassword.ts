@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export default async function hashPassword(inputPassword: string): Promise<string> {
     try {

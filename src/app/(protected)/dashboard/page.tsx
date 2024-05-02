@@ -50,10 +50,12 @@ export default function Dashboard() {
                 }
             })
         });
-        updateUser();
-        const notificationObj = notifications.find((notification) => notification?._id == notificationID);
-        if (notificationObj?.buttonHREF) router.push(notificationObj.buttonHREF);
-        else router.push('/notifications');
+        updateUser().then(() => {
+            const notificationObj = notifications.find((notification) => notification?._id == notificationID);
+            if (notificationObj?.buttonHREF) router.push(notificationObj.buttonHREF);
+            else router.push('/notifications');
+        }
+    )
 
     }
 
