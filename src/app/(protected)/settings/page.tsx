@@ -130,7 +130,7 @@ export default function Settings() {
 
     if (user) {
         if (updatedUser == null) setUpdatedUser(user);
-        console.log(!!user.googleAccount, !googleAccount);
+
         if (!googleAccount && user.googleAccount && !loadingGoogle) {
             setGoogle(true);
             fetchGoogleAccount();

@@ -13,11 +13,11 @@ export async function GET(request: NextRequest, { params } : {params: {meetup: s
     try {
         data = verifyJWT(authorization);
     } catch (e) {
-        return NextResponse.json({error: e})
+        return NextResponse.json({error: "JWT Expired"})
     }
 
     if ("error" in data) {
-        return NextResponse.json({error: data.error})
+        return NextResponse.json({error: "JWT Expired"})
     }
     if (data.type == "api"){
         // Do additional checks for scopes

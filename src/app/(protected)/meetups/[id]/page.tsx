@@ -10,11 +10,10 @@ import {
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {useRouter} from "next13-progressbar";
-import {Meetup, User, defaultUser} from "@/types";
+import {Meetup, User} from "@/types";
 import {useEffect, useState} from "react";
 import {useContext} from "react";
-import {userContext} from "@/app/providers";
-import useSession from "@/app/components/utils/sessionProvider";
+import {userContext, sessionContext} from "@/app/providers";
 import formatAttendeesString from "@/app/(protected)/meetups/formatAttendeesString";
 import formatMemberString from "@/app/(protected)/meetups/formatMemberString";
 
@@ -35,11 +34,10 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
 
 
     // Get TOKEN from cookie
-    const {session, status} = useSession();
+    const {session, status} = useContext(sessionContext);
 
     useEffect(() => {
-        if (status == "done" && user && loadingData) {
-            setLoadingData(false);
+        if (status == "done" && user && !meetup) {
             fetch(`/api/meetup/` + params.id, {
                 method: "GET",
                 headers: {
@@ -50,7 +48,6 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                 data.json().then((meetupData) => {
                     setMeetup(meetupData);
                     if (user._id == meetupData.creator) {
-                        setMeetupAttendees((prev) => [...prev, user]);
                         setMeetupCreator(user);
                         setAvailability(3);
                     } else if (meetupData.attendees.includes(user._id)) {
@@ -60,7 +57,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                     } else {
                         setAvailability(0);
                     }
-                    if (!meetupCreator) {
+                    if (meetupData.creator != user._id) {
                         fetch(`/api/user/` + meetupData.creator, {
                             method: "GET",
                             headers: {
@@ -74,58 +71,66 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                             });
                         });
                     }
-                    meetupData.attendees.map((attendee: string) => {
-                        fetch(`/api/user/` + attendee, {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${session.token}`,
-                            }
-                        }).then((data) => {
-                            data.json().then((userData) => {
-                                setMeetupAttendees((prev) => [...prev, userData]);
-                            });
-                        });
-                    });
-
-                    meetupData.unavailable.map((attendee: string) => {
-                        fetch(`/api/user/` + attendee, {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${session.token}`,
-                            }
-                        }).then((data) => {
-                            data.json().then((userData) => {
-                                setMeetupUnavailable((prev) => [...prev, userData]);
-                            });
-                        });
-                    });
-
-                    meetupData.invited.map((attendee: string) => {
-                        if (attendee.includes('@')) {
-                            return;
-                        }
-                        fetch(`/api/user/` + attendee, {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${session.token}`,
-                            }
-                        }).then((data) => {
-                            data.json().then((userData) => {
-                                setMeetupUndecided((prev) => [...prev, userData]);
-                            });
-                        });
-                    });
-                });
+                })
             });
-        } else if (status == "error") {
-            if (typeof window !== "undefined") {
-                router.push("/login");
-            }
         }
-    }, [loadingData, meetup, meetupCreator, params.id, router, session.token, status, user]);
+
+            if (meetup && meetup.attendees.length > 0 && meetupAttendees.length != meetup.attendees.length) {
+                const attendeesPromise = Promise.all(meetup.attendees.map(async (attendee: string) => {
+                    const attendeeData = await fetch(`/api/user/` + attendee, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${session.token}`,
+                        }
+                    });
+                    return await attendeeData.json();
+                }));
+
+                attendeesPromise.then((data) => {
+                    setMeetupAttendees(data);
+                });
+            }
+
+            if (meetup && meetup.unavailable && !meetupUnavailable.length) {
+                const unavailablePromise = Promise.all(meetup.unavailable.map(async (attendee: string) => {
+                    const unavailableData = await fetch(`/api/user/` + attendee, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${session.token}`,
+                        }
+                    });
+                    return await unavailableData.json();
+                }));
+
+                unavailablePromise.then((data) => {
+                    setMeetupUnavailable(data);
+                });
+            }
+
+            if (meetup && meetup.invited && !meetupUndecided.length) {
+
+                const undecidedPromise = Promise.all(meetup.invited.map(async (attendee: string) => {
+                    if (attendee.includes('@')) {
+                        return;
+                    }
+                    const undecidedData = await fetch(`/api/user/` + attendee, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${session.token}`,
+                        }
+                    });
+
+                    return await undecidedData.json();
+                }));
+
+                undecidedPromise.then((data) => {
+                    setMeetupUndecided(data);
+                });
+            }
+    }, [loadingData, meetup, meetupAttendees.length, meetupCreator, meetupUnavailable.length, meetupUndecided.length, params.id, router, session.token, status, user]);
 
     const attendeeData = formatAttendeesString(meetupAttendees, user);
     const undecidedData = formatMemberString(meetupUndecided);
@@ -229,9 +234,9 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     </AvatarGroup>
 
 
-                                    <span className="ml-4 mt-2 ">
-                                        {attendeeData == null ? <Skeleton/> : undecidedData.invitedShow}
-                                        <span className={(attendeeData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>undecided</span>
+                                    <span className={(undecidedData?.invitedAvatars.length > 0 ? "ml-4" : "") + " mt-2 "}>
+                                        {undecidedData == null ? <Skeleton/> : undecidedData.invitedShow}
+                                        <span className={(undecidedData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>undecided</span>
                       </span>
 
                                 </div>

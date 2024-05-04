@@ -4,16 +4,35 @@ import React, {Children, useContext, useEffect, useState} from "react";
 import { userContext } from "@/app/providers";
 import {Bars3BottomLeftIcon} from "@heroicons/react/24/outline";
 import Sidebar from "@/app/components/sidebar";
-import {BreadcrumbItem, Breadcrumbs} from "@nextui-org/react";
+import {useRouter} from "next13-progressbar";
+import {Button, Modal, ModalBody, ModalFooter, ModalHeader, useDisclosure, ModalContent} from "@nextui-org/react";
 
 export default function ProtectedLayout({children}: Readonly<{children: React.ReactNode}>){
     const pathname = usePathname();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const {user, updateUser} = useContext(userContext);
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
+    const sidebarRef = React.useRef(null);
+    const router = useRouter();
 
     useEffect(() => {
         setSidebarExpanded(false);
     }, [pathname]);
+
+    useEffect(() => {
+        function handleClickOutside(event: { target: any; }) {
+            // @ts-ignore
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target) && sidebarExpanded) {
+                setSidebarExpanded(false)
+            }
+        }
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [sidebarExpanded, sidebarRef]);
 
     let active;
     let navName;
@@ -46,8 +65,11 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
     }
 
     return (
+        <>
+
+
         <div className="relative flex flex-row w-screen h-full">
-            <Sidebar active={active} user={user} expanded={sidebarExpanded} setExpanded={setSidebarExpanded}/>
+            <Sidebar active={active} sidebarRef={sidebarRef} user={user} expanded={sidebarExpanded} setExpanded={setSidebarExpanded}/>
 
             <div className={(sidebarExpanded ? "blur-sm" : "") + " flex flex-col w-full  bg-stone-100 dark:bg-black"}>
                 <div className="flex flex-row items-center min-h-20 h-20 p-4 justify-between w-full bg-white dark:bg-black border-b dark:border-stone-800 border-stone-200">
@@ -56,8 +78,10 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
                     <p className="text-blue-500 text-2xl font-bold">{navName}</p>
                     </div>
                 </div>
+
                 { children }
             </div>
         </div>
+        </>
     )
 }

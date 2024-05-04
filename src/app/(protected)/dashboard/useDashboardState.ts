@@ -1,8 +1,7 @@
 import {useContext, useState} from "react";
-import {userContext} from "@/app/providers";
+import {sessionContext, userContext, expiredContext} from "@/app/providers";
 import {AppNotification, Meetup, User} from "@/types";
 import {useRouter} from "next13-progressbar";
-import useSession from "@/app/components/utils/sessionProvider";
 
 export default function useDashboardState() {
     const {user, updateUser} = useContext(userContext);
@@ -13,7 +12,8 @@ export default function useDashboardState() {
     const [knownMeetups, setKnownMeetups] = useState<Meetup[]>([]);
     const router = useRouter();
     // Get TOKEN from cookie
-    const { session, status } = useSession();
+    const { session, status } = useContext(sessionContext);
+    const {expired, setExpired} = useContext(expiredContext);
 
     return {
         user,
@@ -30,7 +30,9 @@ export default function useDashboardState() {
         status,
         knownMeetups,
         setKnownMeetups,
-        updateUser
+        updateUser,
+        expired,
+        setExpired
     };
 
 }

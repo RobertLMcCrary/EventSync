@@ -6,9 +6,8 @@ import React, {useContext, useState} from "react";
 import CreateMeetupStep1 from "@/app/components/create-meetup/createMeetupStep1";
 import CreateMeetupStep2 from "@/app/components/create-meetup/createMeetupStep2";
 import CreateMeetupStep3 from "@/app/components/create-meetup/createMeetupStep3";
-import useSession from "@/app/components/utils/sessionProvider";
 import {useRouter} from "next13-progressbar";
-import {userContext} from "@/app/providers";
+import {userContext, sessionContext} from "@/app/providers";
 import {now, getLocalTimeZone} from '@internationalized/date';
 
 export default function CreateMeetup() {
@@ -29,13 +28,13 @@ export default function CreateMeetup() {
     const [loadingUser, setLoadingUser] = useState(true);
     const [userEmail, setUserEmail] = useState("");
     const [meetupCreationLoading, setMeetupCreationLoading] = useState<0 | 1 | 2>(0); // 0 = not started, 1 = loading, 2 = done
-    const session = useSession();
+    const session = useContext(sessionContext);
     const router = useRouter();
 
 
     function createMeetup() {
         setMeetupCreationLoading(1)
-        if (user?.googleAccount) {
+        if (user?.googleAccount && user.googleAccount.scope.includes("https://www.googleapis.com/auth/calendar.events")) {
             fetch(process.env.NEXT_PUBLIC_GOOGLE_URL + '/google/createEvent', {
                 method: 'POST',
                 headers: {
@@ -106,14 +105,15 @@ export default function CreateMeetup() {
                     ])
                     return;
                 }
-                const friendPromises = user.friends.map((friendID: string) => {
-                    return fetch(`/api/user/${friendID}`, {
+                const friendPromises = user.friends.map(async (friendID: string) => {
+                    const res = await fetch(`/api/user/${friendID}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${session.session.token}`
                         }
-                    }).then((res) => res.json());
+                    });
+                    return await res.json();
                 });
 
                 Promise.all(friendPromises).then((friendsList) => {
@@ -122,8 +122,6 @@ export default function CreateMeetup() {
             });
         });
         setLoadingUser(false);
-    } else if (session.status == "error"){
-        router.push("/login");
     }
 
     function changeStep(){

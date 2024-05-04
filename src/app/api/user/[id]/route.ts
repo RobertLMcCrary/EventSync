@@ -11,7 +11,13 @@ export async function GET(request: NextRequest, { params } : {params: {id: strin
     // Make sure request is authorized
     const headersInstance = headers()
     const authorization = headersInstance.get('authorization');
-    const data = verifyJWT(authorization);
+    let data;
+
+    try {
+        data = verifyJWT(authorization);
+    } catch (e) {
+        return NextResponse.json({error: "JWT Expired"})
+    }
 
     if ("error" in data) {
         return NextResponse.json({error: data.error})

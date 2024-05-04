@@ -9,7 +9,7 @@ import fetchData from './fetchData';
 
 
 export default function Dashboard() {
-    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser} = useDashboardState();
+    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired} = useDashboardState();
 
     useEffect(() => {
         fetchData({
@@ -25,8 +25,9 @@ export default function Dashboard() {
             status,
             knownMeetups,
             setKnownMeetups,
+            setExpired
         });
-    }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups]);
+    }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups, setExpired]);
 
     function viewNotification(notificationID: string){
         if (!user) return;

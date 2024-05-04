@@ -1,5 +1,4 @@
 import {Meetup, User, AppNotification, ReadNotification} from '@/types';
-import {getUpcomingEvents} from "@/app/api/utils/eventFinder";
 
 interface fetchParams {
     session: any;
@@ -14,42 +13,35 @@ interface fetchParams {
     status: string;
     knownMeetups: (Meetup)[];
     setKnownMeetups: any;
+    setExpired: any;
 }
 
-export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups} : fetchParams){
+export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired} : fetchParams){
     if (!user) return;
     if (!knownUsers.includes(user)) setKnownUsers((prev: any) => [...prev, user]);
 
-    if (status == 'error') {
-        router.push('/login?redirect=/dashboard');
-        return;
-    }
     if (status != 'done') return;
 
+    if (user.meetups && (meetups.includes(null) || meetups.length != user.meetups.length)) {
 
-
-
-    if (user.meetups && meetups.includes(null)) {
-        setMeetups([]);
-        user.meetups.forEach((meetupID: string) => {
-            fetch(`/api/meetup/${meetupID}`, {
+        const fetchPromises = user.meetups.map(async (meetupID: string) => {
+            const res = await fetch(`/api/meetup/${meetupID}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.token}`
                 }
-            }).then((res) => {
-                res.json().then((meetup) => {
-                    if ('error' in meetup) {
-                        router.push('/login?redirect=/dashboard');
-                        return;
-                    }
-                    if (new Date().getTime() - new Date(meetup.date.toLocaleString()).getTime() > 0) return;
-                    setMeetups((prev: any) => [...prev, meetup]);
-                    setKnownMeetups((prev: any) => [...prev, meetup]);
-                    if (knownUsers.find((user: User) => user._id == meetup.creator)) {
-                        return;
-                    }
+            });
+            return await res.json();
+        });
+
+        Promise.all(fetchPromises).then((meetupsData) => {
+            const validMeetups = meetupsData.filter(meetup => !('error' in meetup) && new Date().getTime() - new Date(meetup.date.toLocaleString()).getTime() <= 0);
+            setMeetups(validMeetups);
+            setKnownMeetups((prev: any) => [...prev, ...validMeetups]);
+
+            validMeetups.forEach((meetup) => {
+                if (!knownUsers.find((user: User) => user._id == meetup.creator)) {
                     fetch(`/api/user/${meetup.creator}`, {
                         method: 'GET',
                         headers: {
@@ -58,13 +50,18 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                         }
                     }).then((res) => {
                         res.json().then((creator) => {
-                            setKnownUsers((prev: any) => [...prev, creator]);
+                            if (!("error" in creator)) {
+                                setKnownUsers((prev: any) => [...prev, creator]);
+                            }
                         });
                     });
-                });
+                }
             });
+        }).catch((error) => {
+            console.error("Error fetching meetups: ", error);
         });
     }
+
 
     if (user.notifications && notifications.includes(null)) {
         setNotifications([]);
@@ -78,6 +75,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                 }
             }).then((res) => {
                 res.json().then((notification) => {
+
                     setNotifications((prev: any) => [...prev, notification]);
                     if (notification.initiator) {
                         if (knownUsers.find((user: User) => user._id == notification.initiator)) {
@@ -91,6 +89,10 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                             }
                         }).then((res) => {
                             res.json().then((initiator) => {
+                                if ("error" in initiator) {
+                                    setExpired(true);
+                                    return;
+                                }
                                 setKnownUsers((prev: any) => [...prev, initiator]);
                             });
                         });

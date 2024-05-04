@@ -10,7 +10,7 @@ import { Button, Badge, Skeleton, Popover, PopoverTrigger, PopoverContent, Image
 import { useRouter } from 'next13-progressbar';
 import { useEffect, useState } from "react";
 
-export default function Sidebar({ active, user, expanded, setExpanded } : { active: string, user: User | null, expanded: boolean, setExpanded: any}) {
+export default function Sidebar({ active, user, expanded, setExpanded, sidebarRef } : { active: string, user: User | null, expanded: boolean, setExpanded: any, sidebarRef: any}) {
     const router = useRouter();
     const [unreadNotifications, setUnreadNotifications] = useState(0);
 
@@ -35,7 +35,7 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
     }
 
     return (
-        <aside className={asideClasses}>
+        <aside ref={sidebarRef} className={asideClasses}>
 
             <div className="flex absolute top-0 w-full bg-stone-50 dark:bg-stone-950 justify-center border-b dark:border-stone-800 border-stone-200">
                 <div className={expanded ? "hidden" : "block"}>
