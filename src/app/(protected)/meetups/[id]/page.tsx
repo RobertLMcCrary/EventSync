@@ -1,6 +1,6 @@
 // TODO: Complete the MeetupProfile component
 "use client";
-import {Card, CardBody, Button, Skeleton, Image, Avatar} from "@nextui-org/react";
+import {Card, CardBody, Button, Skeleton, Image, Avatar, AvatarGroup} from "@nextui-org/react";
 import {
     ClockIcon,
     MagnifyingGlassIcon,
@@ -15,6 +15,8 @@ import {useEffect, useState} from "react";
 import {useContext} from "react";
 import {userContext} from "@/app/providers";
 import useSession from "@/app/components/utils/sessionProvider";
+import formatAttendeesString from "@/app/(protected)/meetups/formatAttendeesString";
+import formatMemberString from "@/app/(protected)/meetups/formatMemberString";
 
 export default function MeetupProfile({params}: { params: { id: string } }) {
     const {user, updateUser} = useContext(userContext);
@@ -29,13 +31,15 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     let [meetupUndecided, setMeetupUndecided] = useState<User[]>([]);
     const [availability, setAvailability] = useState<0 | 1 | 2 | 3>(0);
     const router = useRouter();
+    const [loadingData, setLoadingData] = useState<boolean>(true);
 
 
     // Get TOKEN from cookie
     const {session, status} = useSession();
 
     useEffect(() => {
-        if (status == "done" && user && !meetup) {
+        if (status == "done" && user && loadingData) {
+            setLoadingData(false);
             fetch(`/api/meetup/` + params.id, {
                 method: "GET",
                 headers: {
@@ -44,20 +48,16 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                 },
             }).then((data) => {
                 data.json().then((meetupData) => {
-                    console.log(meetupData)
                     setMeetup(meetupData);
                     if (user._id == meetupData.creator) {
                         setMeetupAttendees((prev) => [...prev, user]);
                         setMeetupCreator(user);
                         setAvailability(3);
                     } else if (meetupData.attendees.includes(user._id)) {
-                        setMeetupAttendees((prev) => [...prev, user]);
                         setAvailability(1)
                     } else if (meetupData.unavailable.includes(user._id)) {
-                        setMeetupUnavailable((prev) => [...prev, user]);
                         setAvailability(2)
                     } else {
-                        setMeetupUndecided((prev) => [...prev, user]);
                         setAvailability(0);
                     }
                     if (!meetupCreator) {
@@ -70,9 +70,54 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                         }).then((data) => {
                             data.json().then((userData) => {
                                 setMeetupCreator(userData);
+                                setMeetupAttendees((prev) => [...prev, userData]);
                             });
                         });
                     }
+                    meetupData.attendees.map((attendee: string) => {
+                        fetch(`/api/user/` + attendee, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${session.token}`,
+                            }
+                        }).then((data) => {
+                            data.json().then((userData) => {
+                                setMeetupAttendees((prev) => [...prev, userData]);
+                            });
+                        });
+                    });
+
+                    meetupData.unavailable.map((attendee: string) => {
+                        fetch(`/api/user/` + attendee, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${session.token}`,
+                            }
+                        }).then((data) => {
+                            data.json().then((userData) => {
+                                setMeetupUnavailable((prev) => [...prev, userData]);
+                            });
+                        });
+                    });
+
+                    meetupData.invited.map((attendee: string) => {
+                        if (attendee.includes('@')) {
+                            return;
+                        }
+                        fetch(`/api/user/` + attendee, {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${session.token}`,
+                            }
+                        }).then((data) => {
+                            data.json().then((userData) => {
+                                setMeetupUndecided((prev) => [...prev, userData]);
+                            });
+                        });
+                    });
                 });
             });
         } else if (status == "error") {
@@ -80,8 +125,11 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                 router.push("/login");
             }
         }
-    }, [meetup, meetupCreator, params.id, router, session.token, status, user]);
+    }, [loadingData, meetup, meetupCreator, params.id, router, session.token, status, user]);
 
+    const attendeeData = formatAttendeesString(meetupAttendees, user);
+    const undecidedData = formatMemberString(meetupUndecided);
+    const unavailableData = formatMemberString(meetupUnavailable);
     return (
         <div className="flex items-center h-[calc(100vh-80px)] justify-center align-middle  p-4 md:p-8">
             <Card className="w-full h-full">
@@ -95,7 +143,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                     }
 
                     <div className="flex flex-col md:flex-row md:gap-4 p-8 flex-grow">
-                        <div className="flex-1 h-full md:w-1/2 w-full md:justify-between flex flex-col">
+                        <div className="flex-1 h-full md:w-1/2  w-full md:justify-between flex flex-col">
                             <div className="md:flex items-center justify-between flex-row mb-1">
                             <div className="flex flex-row">
                                 {meetup ?
@@ -136,80 +184,62 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                 </div>
                             </div>
                             <div className="my-6">
-                                <div className="flex mb-1">
-                                    <div className="flex -mr-1.5">
-                                        <img
-                                            src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
-                                            className="border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full z-10"
-                                        />
-                                        <img
-                                            src="https://www.petlandtexas.com/wp-content/uploads/2016/08/Red_Bunny_Petland_Puppy.jpg"
-                                            className="-translate-x-3 border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full"
-                                        />
-                                    </div>
-                                    <span>
-                        {meetup ? meetup.creator : "Creator name unavailable"}{" "}
-                                        and 4 others are{" "}
-                                        <span className="font-semibold">coming</span>
+                                <div className="flex flex-row items-center mb-1">
+                                    <AvatarGroup isBordered className="flex mb-2 mt-4 mr-2">
+                                        {attendeeData == null ? <Skeleton/> : attendeeData.attendeeAvatars.map((avatar, index) => (
+                                            <Avatar
+                                                src={avatar}
+                                                key={index}
+                                                alt="avatar"
+                                            />
+                                        ))}
+                                    </AvatarGroup>
+                                    <span className="ml-4 mt-2 ">
+                                        {attendeeData == null ? <Skeleton/> : attendeeData.attendeesShow}
+                                        <span className={(attendeeData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>coming</span>
                       </span>
                                 </div>
                                 <div className="flex mb-1">
-                                    <div className="flex -mr-1.5">
-                                        <img
-                                            src="https://bestfriends.org/sites/default/files/2023-02/Victory3427MW_Social.jpg"
-                                            className="border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full z-10"
-                                        />
-                                        <img
-                                            src="https://cdn.britannica.com/34/235834-050-C5843610/two-different-breeds-of-cats-side-by-side-outdoors-in-the-garden.jpg"
-                                            className="-translate-x-3 border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full"
-                                        />
-                                    </div>
-                                    <span>
-                        [name] and 2 others are{" "}
-                                        <span className="font-semibold">not coming</span>
+                                    <AvatarGroup max={3} isBordered className="flex mb-2 mr-2">
+                                        {attendeeData == null ? <Skeleton/> : unavailableData.invitedAvatars.map((avatar, index) => (
+                                            <Avatar
+                                                src={avatar}
+                                                key={index}
+                                                alt="avatar"
+                                            />
+                                        ))}
+                                    </AvatarGroup>
+                                    <span className={(unavailableData?.invitedAvatars.length > 0 ? "ml-4" : "") + " mt-2 "}>
+                                        {unavailableData == null ? <Skeleton/> : unavailableData.invitedShow}
+                                        <span className={(unavailableData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>not coming</span>
+
                       </span>
                                 </div>
-                                <div className="flex mb-1">
-                                    <div className="flex -mr-1.5">
-                                        <img
-                                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwDb8nupIgI-CcUXjpWxenl2yDLFnXsul2ozPZN280Ew&s"
-                                            className="border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full z-10"
-                                        />
-                                        <img
-                                            src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg"
-                                            className="-translate-x-3 border-[1.5px] border-gray-500 w-6 h-6 object-cover rounded-full"
-                                        />
-                                    </div>
-                                    <span>
-                        [name] and [name] are{" "}
-                                        <span className="font-semibold">undecided</span>
+
+
+                                <div className="flex flex-row items-center mb-1">
+                                    <AvatarGroup isBordered className="flex mb-2 mt-4 mr-2">
+                                        {unavailableData == null ? <Skeleton/> : undecidedData.invitedAvatars.map((avatar, index) => (
+                                            <Avatar
+                                                src={avatar}
+                                                key={index}
+                                                alt="avatar"
+                                            />
+                                        ))}
+                                    </AvatarGroup>
+
+
+                                    <span className="ml-4 mt-2 ">
+                                        {attendeeData == null ? <Skeleton/> : undecidedData.invitedShow}
+                                        <span className={(attendeeData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>undecided</span>
                       </span>
+
                                 </div>
                             </div>
                             </div>
-                            <div className="flex gap-2 mt-4 md:mt-0">
-                                <Button
-                                    color="primary"
-                                    isDisabled={false}
-                                    onClick={() => {
-                                        console.log("clicked 'I'm coming'!");
-                                    }}
-                                >
-                                    I&apos;m coming
-                                </Button>
-                                <Button
-                                    color="primary"
-                                    variant="ghost"
-                                    isDisabled={false}
-                                    onClick={() => {
-                                        console.log("clicked 'I'm not coming'!");
-                                    }}
-                                >
-                                    I&apos;m not coming
-                                </Button>
-                            </div>
+
                         </div>
-                        <div className="bg-stone-100 dark:bg-stone-950 p-4 h-1/2 rounded-xl overflow-y-scroll flex-1 w-full  md:w-1/2  md:mt-2 md:h-full">
+                        <div className="bg-stone-100 dark:bg-stone-950 p-4 h-1/2 rounded-xl overflow-y-scroll flex-1 w-full  md:w-1/2  md:mt-2 md:h-[calc(100%-32px)]">
                             <div className="flex w-full border-b border-gray-300 dark:border-gray-700 pb-3 mb-3">
                                 <h1 className="text-lg font-semibold">Announcements</h1>
                                 <div className="flex gap-1 ml-auto">

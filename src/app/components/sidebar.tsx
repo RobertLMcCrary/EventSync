@@ -59,11 +59,11 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
             </div>
 
             <div className="w-full h-full flex items-center">
-            <div className="grow flex flex-col items-center justify-items-center">
+            <div className="grow flex flex-col items-center w-full justify-items-center">
                 {sidebarItems.map((item, index) => (
-                    <div key={index} className={(expanded ? "justify-start px-2" : "justify-center xl:justify-start xl:px-2") +" w-full mb-1 flex justify-center items-center xl:justify-start "}>
+                    <div key={index} className={(expanded ? "justify-start px-2" : "justify-center xl:justify-start xl:px-2") +" w-full mb-1 flex items-center"}>
                         <div
-                            className={(active == item.toString().toLowerCase() ? "bg-stone-100 dark:bg-stone-900 dark:hover:bg-stone-950 hover:bg-stone-50" : "xl:dark:hover:bg-stone-900 xl:hover:bg-stone-100") + " flex flex-row p-2 rounded-lg h-full xl:w-full"}>
+                            className={(active == item.toString().toLowerCase() ? "bg-stone-100 dark:bg-stone-900 dark:hover:bg-stone-950 hover:bg-stone-50" : (expanded ? "dark:hover:bg-stone-900 hover:bg-stone-100" : "xl:dark:hover:bg-stone-900 xl:hover:bg-stone-100")) + (expanded? " w-full" : " xl:w-full") + " flex flex-row p-2 rounded-lg h-full"}>
                             <a className={expanded ? "hidden" : "block xl:hidden"} onClick={() => router.push('/'+item.toString().toLowerCase())}>
                                 {item == "Dashboard" && <Tooltip placement="right" color="primary" content="dashboard"><Squares2X2Icon className={(active == item.toString().toLowerCase() ? "dark:text-white text-black font-semibold" : "dark:text-stone-200 text-stone-800") + " w-6 h-6"}/></Tooltip>}
                                 {item == "Notifications" && <Tooltip placement="right" color="primary" content="notifications"><Badge content={unreadNotifications} placement="top-right" color="danger" isInvisible={unreadNotifications == 0}><BellIcon className={(active == item.toString().toLowerCase() ? "text-black dark:text-white font-semibold" : " dark:text-stone-300 text-stone-800") + " w-6 h-6"}/></Badge></Tooltip>}
@@ -96,7 +96,7 @@ export default function Sidebar({ active, user, expanded, setExpanded } : { acti
             </div>
 
 
-            <div className=" justify-center bottom-0 absolute border-t items-center p-4 xl:justify-start flex flex-row border-stone-200 dark:border-stone-800 w-full max-h-18 dark:bg-stone-950 bg-stone-50">
+            <div className={(expanded ? "justify-start" : "justify-center xl:justify-start") + " bottom-0 absolute border-t items-center p-4 flex flex-row border-stone-200 dark:border-stone-800 w-full max-h-18 dark:bg-stone-950 bg-stone-50"}>
                 { user?
                     <Popover backdrop="blur" showArrow placement="top">
                         <PopoverTrigger>

@@ -1,6 +1,5 @@
 // TODO: Complete the Settings component
 "use client";
-import Sidebar from "@/app/components/sidebar";
 import {userContext} from "@/app/providers";
 import useSession from "@/app/components/utils/sessionProvider";
 import {useContext, useState} from "react";

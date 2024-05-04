@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
                 });
 
             } else {
-                console.log(attendee);
+
                 let index = meetup.invited.indexOf(attendee);
-                console.log(index);
+
                 if (index !== -1) {
                     meetup.invited[index] = user._id
                     console.log(meetup.invited);

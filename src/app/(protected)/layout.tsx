@@ -1,6 +1,6 @@
 "use client";
 import {usePathname} from "next/navigation";
-import React, {Children, useContext, useState} from "react";
+import React, {Children, useContext, useEffect, useState} from "react";
 import { userContext } from "@/app/providers";
 import {Bars3BottomLeftIcon} from "@heroicons/react/24/outline";
 import Sidebar from "@/app/components/sidebar";
@@ -11,7 +11,10 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
     const {user, updateUser} = useContext(userContext);
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
-    const [step, setStep] = useState(1);
+    useEffect(() => {
+        setSidebarExpanded(false);
+    }, [pathname]);
+
     let active;
     let navName;
 
