@@ -2,16 +2,13 @@
 // Used in protected API routes
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-export default function verifyJWT(authorization: string | null) {
-    if (!authorization) {
+export default function verifyJWT(token: string | null) {
+    if (!token) {
         return {error: "Unauthorized"}
     }
 
-    const token = authorization.split(' ')[1]
-
     if (!process.env.JWT_SECRET) {
         // this should never happen
-        console.log("JWT_SECRET is not defined in .env.local");
         return {error: "Unauthorized"}
     }
 

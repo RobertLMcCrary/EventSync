@@ -2,49 +2,32 @@ import {NextRequest, NextResponse} from "next/server";
 import { getUser } from "@/db/read/user";
 import { updateUser } from "@/db/update/user";
 import { deleteUser } from "@/db/delete/user";
-import {headers} from "next/headers";
-import verifyJWT from "@/app/api/utils/verifyJWT";
 import hashPassword from "@/app/api/utils/hashPassword";
+import protectedRoute from "@/app/api/utils/protected";
+import {headers} from "next/headers";
 
 
 export async function GET(request: NextRequest, { params } : {params: {id: string}}) {
-    // Make sure request is authorized
-    const headersInstance = headers()
-    const authorization = headersInstance.get('authorization');
-    let data;
-
-    try {
-        data = verifyJWT(authorization);
-    } catch (e) {
-        return NextResponse.json({error: "JWT Expired"})
+    const headersInstance = headers();
+    const isAuthorized = protectedRoute(headersInstance);
+    if (isAuthorized.status !== 200) {
+        return isAuthorized;
     }
 
-    if ("error" in data) {
-        return NextResponse.json({error: data.error})
-    }
-    if (data.type == "api"){
-        // Do additional checks for scopes
-    }
     const user = await getUser({userID: params.id}); // Get user data by ID (user param is the user's ID)
 
     if (!user) {
-        return NextResponse.json({error: 'User not found'});
+        return NextResponse.json({error: 'User not found'}, {status: 404});
     }
 
     return NextResponse.json(user.toJSON()); // Return user data as JSON
 }
 
 export async function PUT(request: NextRequest, { params } : {params: {id: string}}) {
- // Get user data by ID (user param is the user's ID)
     const headersInstance = headers();
-    const authorization = headersInstance.get('authorization');
-    const data = verifyJWT(authorization);
-
-    if ("error" in data) {
-        return NextResponse.json({error: data.error})
-    }
-    if (data.type == "api"){
-        // Do additional checks for scopes
+    const isAuthorized = protectedRoute(headersInstance);
+    if (isAuthorized.status !== 200) {
+        return isAuthorized;
     }
 
     const updateData = await request.json(); // Get user data from request body
@@ -56,13 +39,13 @@ export async function PUT(request: NextRequest, { params } : {params: {id: strin
         if ('username' in updateData['update']['$set']) {
             const user = await getUser({username: updateData['update']['$set']['username']});
             if (user) {
-                return NextResponse.json({error: 'Username already exists'});
+                return NextResponse.json({error: 'Username already exists'}, {status: 400});
             }
         }
         if ('email' in updateData['update']['$set']) {
             const user = await getUser({email: updateData['update']['$set']['email']});
             if (user) {
-                return NextResponse.json({error: 'Email already exists'});
+                return NextResponse.json({error: 'Email already exists'}, {status: 400});
             }
         }
     }
@@ -71,34 +54,29 @@ export async function PUT(request: NextRequest, { params } : {params: {id: strin
     const user = await getUser({userID: params.id});
 
     if (!user) {
-        return NextResponse.json({error: 'User not found'});
+        return NextResponse.json({error: 'User not found'}, {status: 404});
     }
 
     await updateUser(user._id, updateData); // Update user in database
     const updatedUser = await getUser({userID: params.id});
 
     if (!updatedUser) {
-        return NextResponse.json({error: 'User not found'});
+        return NextResponse.json({error: 'User not found'}, {status: 404});
     }
     return NextResponse.json(updatedUser.toJSON()); // Return updated user data as JSON
 }
 
 export async function DELETE(request: NextRequest, { params } : {params: {id: string}}) {
     const headersInstance = headers();
-    const authorization = headersInstance.get('authorization');
-    const data = verifyJWT(authorization);
-
-    if ("error" in data) {
-        return NextResponse.json({error: data.error})
-    }
-    if (data.type == "api"){
-        // Do additional checks for scopes
+    const isAuthorized = protectedRoute(headersInstance);
+    if (isAuthorized.status !== 200) {
+        return isAuthorized;
     }
 
     const user = await getUser({userID: params.id}); // Get user data by ID (user param is the user's ID)
 
     if (!user) {
-        return NextResponse.json({error: 'User not found'});
+        return NextResponse.json({error: 'User not found'}, {status: 404});
     }
 
     await deleteUser(user._id); // Delete user from database

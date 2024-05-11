@@ -14,9 +14,10 @@ interface fetchParams {
     knownMeetups: (Meetup)[];
     setKnownMeetups: any;
     setExpired: any;
+    setGlobalError: any;
 }
 
-export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired} : fetchParams){
+export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired, setGlobalError} : fetchParams){
     if (!user) return;
     if (!knownUsers.includes(user)) setKnownUsers((prev: any) => [...prev, user]);
 
@@ -25,6 +26,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
     if (user.meetups && (meetups.includes(null) || meetups.length != user.meetups.length)) {
 
         const fetchPromises = user.meetups.map(async (meetupID: string) => {
+
             const res = await fetch(`/api/meetup/${meetupID}`, {
                 method: 'GET',
                 headers: {
@@ -32,7 +34,17 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                     'Authorization': `Bearer ${session.token}`
                 }
             });
-            return await res.json();
+            const data = await res.json();
+            if (!res.ok){
+                if (data.error == "Not Authorized"){
+                    setExpired(true);
+
+                } else {
+                    setGlobalError(data.error);
+                }
+                return {error: data.error};
+            }
+            return data;
         });
 
         Promise.all(fetchPromises).then((meetupsData) => {
@@ -50,9 +62,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                         }
                     }).then((res) => {
                         res.json().then((creator) => {
-                            if (!("error" in creator)) {
-                                setKnownUsers((prev: any) => [...prev, creator]);
-                            }
+                            setKnownUsers((prev: any) => [...prev, creator]);
                         });
                     });
                 }
@@ -75,7 +85,14 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                 }
             }).then((res) => {
                 res.json().then((notification) => {
-
+                    if (!res.ok){
+                        if (notification.error == "Not Authorized"){
+                            setExpired(true);
+                        } else {
+                            setGlobalError(notification.error);
+                        }
+                        return;
+                    }
                     setNotifications((prev: any) => [...prev, notification]);
                     if (notification.initiator) {
                         if (knownUsers.find((user: User) => user._id == notification.initiator)) {
@@ -89,9 +106,10 @@ export default function fetchData({session, setKnownUsers, user, setNotification
                             }
                         }).then((res) => {
                             res.json().then((initiator) => {
-                                if ("error" in initiator) {
-                                    setExpired(true);
-                                    return;
+                                if (!res.ok){
+                                    if (initiator.error == "Not Authorized"){
+                                        setExpired(true);
+                                    }
                                 }
                                 setKnownUsers((prev: any) => [...prev, initiator]);
                             });

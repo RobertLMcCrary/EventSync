@@ -1,22 +1,18 @@
 "use client";
 import {usePathname} from "next/navigation";
-import React, {Children, useContext, useEffect, useState} from "react";
-import { userContext } from "@/app/providers";
+import React, {useEffect, useState} from "react";
+import { useUser } from "@/app/providers";
 import {Bars3BottomLeftIcon} from "@heroicons/react/24/outline";
 import Sidebar from "@/app/components/sidebar";
-import {useRouter} from "next13-progressbar";
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader, useDisclosure, ModalContent} from "@nextui-org/react";
 
 export default function ProtectedLayout({children}: Readonly<{children: React.ReactNode}>){
     const pathname = usePathname();
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     const sidebarRef = React.useRef(null);
-    const router = useRouter();
 
     useEffect(() => {
-        setSidebarExpanded(false);
+       if (sidebarExpanded) setSidebarExpanded(false);
     }, [pathname]);
 
     useEffect(() => {
@@ -66,8 +62,6 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
 
     return (
         <>
-
-
         <div className="relative flex flex-row w-screen h-full">
             <Sidebar active={active} sidebarRef={sidebarRef} user={user} expanded={sidebarExpanded} setExpanded={setSidebarExpanded}/>
 

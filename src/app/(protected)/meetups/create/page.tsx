@@ -1,17 +1,16 @@
 "use client";
-import {defaultUser, User} from "@/types";
-import Sidebar from "@/app/components/sidebar";
+import {User} from "@/types";
 import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 import React, {useContext, useState} from "react";
 import CreateMeetupStep1 from "@/app/components/create-meetup/createMeetupStep1";
 import CreateMeetupStep2 from "@/app/components/create-meetup/createMeetupStep2";
 import CreateMeetupStep3 from "@/app/components/create-meetup/createMeetupStep3";
 import {useRouter} from "next13-progressbar";
-import {userContext, sessionContext} from "@/app/providers";
+import {useUser, sessionContext} from "@/app/providers";
 import {now, getLocalTimeZone} from '@internationalized/date';
 
 export default function CreateMeetup() {
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     const [step, setStep] = useState(1);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");

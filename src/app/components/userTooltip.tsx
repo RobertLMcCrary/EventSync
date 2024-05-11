@@ -1,4 +1,3 @@
-import { XMarkIcon } from "@heroicons/react/20/solid";
 import {User} from "@/types";
 import { useRouter } from 'next13-progressbar';
 

@@ -1,7 +1,7 @@
 "use client";
 import MeetupCard from "@/app/components/meetupCard";
 import {useEffect} from "react";
-import {ScrollShadow, Input, Button, Link} from "@nextui-org/react";
+import {Input, Button, Link} from "@nextui-org/react";
 import {MagnifyingGlassIcon, PlusIcon} from "@heroicons/react/24/solid";
 import NotificationCard from "@/app/components/notification";
 import useDashboardState from "@/app/(protected)/dashboard/useDashboardState";
@@ -9,7 +9,7 @@ import fetchData from './fetchData';
 
 
 export default function Dashboard() {
-    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired} = useDashboardState();
+    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired, setGlobalError} = useDashboardState();
 
     useEffect(() => {
         fetchData({
@@ -25,9 +25,10 @@ export default function Dashboard() {
             status,
             knownMeetups,
             setKnownMeetups,
-            setExpired
+            setExpired,
+            setGlobalError
         });
-    }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups, setExpired]);
+    }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups, setExpired, setGlobalError]);
 
     function viewNotification(notificationID: string){
         if (!user) return;

@@ -1,7 +1,7 @@
 import {User} from "@/types";
 
 export default function formatMemberString(meetupInvited: User[]) {
-    let invitedShow = null;
+    let invitedShow: null | string;
     let invitedAvatars: (string | undefined)[] = [];
 
     if (meetupInvited.length > 0) {

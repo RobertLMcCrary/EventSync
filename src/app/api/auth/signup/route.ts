@@ -11,7 +11,6 @@ import {getUser} from "@/db/read/user";
 import {User} from "@/types";
 import hashPassword from "@/app/api/utils/hashPassword";
 import {db} from "@/db/connect";
-import {createNotification} from "@/db/create/notification";
 import {updateMeetup} from "@/db/update/meetup";
 
 export async function POST(request: NextRequest) {
@@ -21,12 +20,12 @@ export async function POST(request: NextRequest) {
     const user = await getUser({email});
 
     if (user) {
-        return NextResponse.json({"error": 'Email already exists'});
+        return NextResponse.json({error: 'Email already exists'}, {status: 400});
     }
     const user2 = await getUser({username});
 
     if (user2) {
-        return NextResponse.json({"error": 'Username already exists'});
+        return NextResponse.json({error: 'Username already exists'}, {status: 400});
     }
 
     password = await hashPassword(password);
@@ -47,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Ensure JWT_SECRET is defined
     if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is not defined');
+        return NextResponse.json({ error: 'JWT_SECRET is not defined' }, { status: 500 });
     }
     // Token can be either user or API token
     // User token gives access to user data
@@ -55,5 +54,5 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign({ userID: newUser._id, type: 'user' }, process.env.JWT_SECRET, {
         expiresIn: '100m',
     });
-    return NextResponse.json({ "token": token, "id": newUser._id });
+    return NextResponse.json({ token: token, id: newUser._id });
 }

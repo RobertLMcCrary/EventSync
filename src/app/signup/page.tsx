@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import VerificationPage from "@/app/signup/verificationPage";
 import {useSearchParams} from "next/navigation";
 import {useGoogleLogin} from "@react-oauth/google";
+import {useUser} from "@/app/providers";
 
 function SignupComponent() {
     const [email, setEmail] = useState('');
@@ -21,6 +22,7 @@ function SignupComponent() {
     const [userID, setUserID] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const {user} = useUser();
     const searchParams = useSearchParams();
     const [inviteData, setInviteData] = useState({} as any);
     const [inviteError, setInviteError] = useState('' as string);
@@ -44,11 +46,10 @@ function SignupComponent() {
                 .then((res) => {
                     res.json().then((data) => {
                         setGoogleLoading(false);
-                        if (data.error) {
+                        if (!res.ok) {
                             setError(data.error);
                         } else {
                             // Redirect to dashboard
-
                             Cookies.set('token', data.token);
                             if (searchParams.has('meetupInvite')){
                                 updateMeetupInvite(data);
@@ -72,52 +73,58 @@ function SignupComponent() {
     });
 
     useEffect(() => {
-        if (searchParams.has('meetupInvite')) {
-            const token = searchParams.get('meetupInvite');
-            fetch('/api/auth/verify', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            }).then((res) => {
-                res.json().then((data) => {
-                    if (data.error) {
+        const token = searchParams.get('meetupInvite');
+        if (!token) return;
+
+        fetch('/api/auth/verify', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        }).then((res) => {
+            res.json().then((data) => {
+                if (!res.ok) {
+                    setInviteError("This invite is invalid or has expired");
+                } else {
+                    if (data.data.type !== 'meetup-invitation') {
                         setInviteError("This invite is invalid or has expired");
-                    } else {
-                        if (data.data.type !== 'meetup-invitation') {
-                            setInviteError("This invite is invalid or has expired");
-                            return;
-                        }
-                        if (!data.data.userID.includes('@')){
-                            setInviteError("You already have an account. Please use the original invite link");
-                            return;
-                        }
-                        // Check if user exists
-                        // If user exists, redirect to meetup invite page
-                        // If user does not exist, show signup form
-                        fetch(`/api/user/find`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ email: data.data.userID }),
-                        }).then((res) => {
-                            res.json().then((userData) => {
-                                if (userData.error) {
-                                    setEmail(data.data.userID);
-                                    setEmailDisabled(true);
-                                    setInviteData(data.data);
-                                } else {
-                                    router.push('/meetups/invite/'+token);
-                                }
-                            });
-                        });
+                        return;
                     }
-                });
+                    if (!data.data.userID.includes('@')){
+                        setInviteError("You already have an account. Please use the original invite link");
+                        return;
+                    }
+                    // Check if user exists
+                    // If user exists, redirect to meetup invite page
+                    // If user does not exist, show signup form
+                    fetch(`/api/user/find`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: data.data.userID }),
+                    }).then((res) => {
+                        res.json().then((userData) => {
+                            if (!res.ok) {
+                                setEmail(data.data.userID);
+                                setEmailDisabled(true);
+                                setInviteData(data.data);
+                            } else {
+                                router.push('/meetups/invite/'+token);
+                            }
+                        });
+                    });
+                }
             });
-        }
+        });
     }, [router, searchParams]);
+
+    if (user){
+        router.push('/dashboard');
+        return (<div></div>);
+    }
+
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         // POST request to /api/auth/signup
         e.preventDefault();
@@ -141,7 +148,7 @@ function SignupComponent() {
             .then((res)=> {
                 res.json().then((data) => {
                     setIsLoading(false);
-                    if (data.error) {
+                    if (!res.ok) {
                         setError(data.error);
                     } else {
                         // Redirect to dashboard
@@ -165,7 +172,7 @@ function SignupComponent() {
             body: JSON.stringify({ email, username }),
         }).then((res) => {
             res.json().then((data) => {
-                if (data.error) {
+                if (!res.ok) {
                     setVerificationError(data.error);
                 } else {
                     setVerificationCode(data.message);

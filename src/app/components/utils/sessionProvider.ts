@@ -31,13 +31,12 @@ export default function useSession(){
         }).then((res) => {
             const data = res.json();
             data.then((userData) => {
-                if ('data' in userData) {
-                    setSession(new Session(userData.data.userID, token));
-                    setStatus('done');
-                } else {
+                if (!res.ok) {
                     setStatus('error');
-                    Cookies.set('token', '');
+                    return;
                 }
+                setSession(new Session(userData.userID, token));
+                setStatus('done');
             });
         });
 

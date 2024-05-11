@@ -1,24 +1,25 @@
 'use client'
 
-import {Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, NextUIProvider} from '@nextui-org/react'
+import {NextUIProvider} from '@nextui-org/react'
 import {ThemeProvider as NextThemesProvider, useTheme} from "next-themes";
 import {useRouter} from "next13-progressbar";
 import { Next13ProgressBar } from 'next13-progressbar';
 import useSession from "@/app/components/utils/sessionProvider";
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter as useNextRouter} from 'next/navigation';
 import {User} from "@/types";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 type UserWithUpdate = {
     user: User | null;
     updateUser: () => Promise<void>;
+    setUser: any;
 };
-
 
 const userContext = createContext<UserWithUpdate>({
     user: null,
     updateUser: async () => {},
+    setUser: () => {},
 });
 
 type expiredSession = {
@@ -39,10 +40,16 @@ const sessionContext = createContext<ReturnType<typeof useSession>>({
     status: "loading"
 });
 
+const globalErrorContext = createContext<{globalError: string, setGlobalError: any}>({
+    globalError: "",
+    setGlobalError: () => {}
+});
+
 const PROTECTED_ROUTES = ['/dashboard', '/get-started', '/friends', '/meetups', '/notifications', '/settings', '/meetups/create', '/meetups/edit']
 
 export function Providers({children}: { children: React.ReactNode }) {
     const router = useRouter();
+    const [globalError, setGlobalError] = useState<string>("");
 
     const session = useSession();
     const [user, setUser] = useState<User | null>(null);
@@ -59,104 +66,77 @@ export function Providers({children}: { children: React.ReactNode }) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session.session.token}`
             },
-        }).then((data) => {
-            data.json().then((userData) => {
-                if ("error" in userData){
-                    setExpired(true);
-                    return;
-                }
+        }).then((res) => {
+            if (!res.ok) {
+                console.log("update user error");
+                setExpired(true);
+                return;
+            }
+            res.json().then((userData) => {
                 setUser(userData);
                 setTheme(userData.theme);
             });
         });
-    }, [expired, session.session.token, session.session.userID, setTheme])
+    }, [expired, session.session.token, session.session.userID, setTheme]);
 
     useEffect(() => {
-
-        // Redirect to the dashboard if the user is already logged in
-        if (pathname == "/login" && user){
-            router.push("/dashboard");
-            return;
-        }
-
-        // Sign out the user if they navigate to the signout page
-        if (pathname == "/signout") {
-            setUser(null);
-        }
-
-
+        console.log(pathname, expired);
         // Only fetch user data if the route is protected
         if (!PROTECTED_ROUTES.map((route) => pathname.startsWith(route)).includes(true)) {
             setExpired(false);
-            return;
         }
+
+        if (expired) return;
 
         // If the session has expired, show the modal
         if (session.status == "error") {
+            console.log("session error")
             setExpired(true);
             return;
         }
 
-        // If the session data is loaded, fetch the user data
-        if (session.status == "done" && !user){
-            fetch(`/api/user/${session.session.userID}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.session.token}`
-                }
-            }).then((data) => {
-                data.json().then((userData) => {
+        if (user || session.status == "loading") return;
 
-                    if ("error" in userData){
-                        setExpired(true);
-                        return;
-                    }
+        fetch(`/api/user/${session.session.userID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`
+            }
+        }).then((res) => {
+            if (!res.ok){
+                console.log("loading user error");
+                setExpired(true);
+                return;
+            }
+            res.json().then((userData) => {
+                setUser(userData);
+                setTheme(userData.theme);
+            })
+        });
 
-                    setUser(userData);
-                    setTheme(userData.theme);
-                })
-            });
-        }
 
-        // fetch user data every 60 seconds
         const intervalId = setInterval(async () => {
             await updateUser();
-        }, 60 * 1000); // 60 seconds
+        }, 1000 * 60 * 5);
 
-        // Clear the interval when the component is unmounted
         return () => clearInterval(intervalId);
 
-    }, [pathname, expired, router, session.session.token, session.session.userID, session.status, setTheme, updateUser, user]);
+    }, [expired, router, session.session.token, session.session.userID, session.status, setTheme, updateUser, user, pathname]);
 
     return (
         <NextUIProvider navigate={router.push}>
             <NextThemesProvider attribute="class" defaultTheme="system">
                 <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string}>
                     <sessionContext.Provider value={session}>
+                        <globalErrorContext.Provider value={{globalError, setGlobalError}}>
                         <expiredContext.Provider value={{expired, setExpired}}>
-                        <userContext.Provider value={{user, updateUser}}>
-                            <Modal isDismissable={false} isOpen={expired}>
-                                <ModalContent>
-                                    <ModalHeader>Session Expired</ModalHeader>
-                                    <ModalBody>
-                                        You are not logged in or your session has expired.
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        <Button color="primary" onClick={() => {
-                                            setExpired(false);
-                                            setUser(null);
-                                            router.push('/login?redirect='+ pathname);
-                                        }}>
-                                            Log In
-                                        </Button>
-                                    </ModalFooter>
-                                </ModalContent>
-                            </Modal>
+                        <userContext.Provider value={{user, updateUser, setUser}}>
                             {children}
                             <Next13ProgressBar height="4px" color="#0A2FFF" options={{ showSpinner: false }} showOnShallow />
                         </userContext.Provider>
                         </expiredContext.Provider>
+                        </globalErrorContext.Provider>
                     </sessionContext.Provider>
                 </GoogleOAuthProvider>
             </NextThemesProvider>
@@ -164,4 +144,8 @@ export function Providers({children}: { children: React.ReactNode }) {
     )
 }
 
-export { userContext,  sessionContext, expiredContext }
+export function useUser(){
+    return React.useContext(userContext);
+}
+
+export { sessionContext, expiredContext, globalErrorContext }

@@ -1,8 +1,8 @@
 // TODO: Complete the Settings component
 "use client";
-import {userContext} from "@/app/providers";
+import {useUser} from "@/app/providers";
 import useSession from "@/app/components/utils/sessionProvider";
-import {useContext, useState} from "react";
+import {useState} from "react";
 import {Button, Tabs, Tab, Avatar, Badge, Switch, Skeleton, Autocomplete, AutocompleteItem} from "@nextui-org/react";
 import {PencilSquareIcon, PencilIcon} from "@heroicons/react/24/outline";
 import {XMarkIcon, CheckIcon} from "@heroicons/react/24/solid";
@@ -13,7 +13,7 @@ import Cookies from "js-cookie";
 import {User} from "@/types";
 
 export default function Settings() {
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     const [googleAccount, setGoogleAccount] = useState<any>(null);
     const [googleError, setGoogleError] = useState<string>("");
     const [updateError, setUpdateError] = useState<string>("");
@@ -66,7 +66,7 @@ export default function Settings() {
             })
                 .then((res) => {
                     res.json().then((data) => {
-                        if (data.error) {
+                        if (!res.ok) {
                             setLoadingGoogle(false)
                             setGoogleError(data.error);
                         } else {

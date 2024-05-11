@@ -1,8 +1,6 @@
 "use client"
 import Image from "next/image";
-import { Meetup, defaultMeetup, User, defaultUser } from "@/types";
-import MeetupCard from "@/app/components/meetupCard";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next13-progressbar"
 import { useTheme } from "next-themes";
 
@@ -12,7 +10,6 @@ import 'aos/dist/aos.css';
 
 //nextui
 import {
-    NextUIProvider,
     Navbar,
     NavbarContent,
     NavbarBrand,

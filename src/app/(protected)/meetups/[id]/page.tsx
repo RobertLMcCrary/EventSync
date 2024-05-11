@@ -1,6 +1,6 @@
 // TODO: Complete the MeetupProfile component
 "use client";
-import {Card, CardBody, Button, Skeleton, Image, Avatar, AvatarGroup} from "@nextui-org/react";
+import {Card, CardBody, Skeleton, Avatar, AvatarGroup} from "@nextui-org/react";
 import {
     ClockIcon,
     MagnifyingGlassIcon,
@@ -13,12 +13,12 @@ import {useRouter} from "next13-progressbar";
 import {Meetup, User} from "@/types";
 import {useEffect, useState} from "react";
 import {useContext} from "react";
-import {userContext, sessionContext} from "@/app/providers";
+import {useUser, sessionContext} from "@/app/providers";
 import formatAttendeesString from "@/app/(protected)/meetups/formatAttendeesString";
 import formatMemberString from "@/app/(protected)/meetups/formatMemberString";
 
 export default function MeetupProfile({params}: { params: { id: string } }) {
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     let [meetup, setMeetup] = useState<Meetup | null>(null);
     let [newAnnouncementVis, setNewAnnouncementVis] = useState(false);
     let [searchAnnouncementsVis, setSearchAnnouncementsVis] = useState(false);
@@ -37,7 +37,8 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const {session, status} = useContext(sessionContext);
 
     useEffect(() => {
-        if (status == "done" && user && !meetup) {
+        if (status == "done" && user && loadingData) {
+            setLoadingData(false);
             fetch(`/api/meetup/` + params.id, {
                 method: "GET",
                 headers: {
@@ -92,7 +93,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                 });
             }
 
-            if (meetup && meetup.unavailable && !meetupUnavailable.length) {
+            if (meetup && meetup.unavailable.length > 0 && meetupUnavailable.length != meetup.unavailable.length) {
                 const unavailablePromise = Promise.all(meetup.unavailable.map(async (attendee: string) => {
                     const unavailableData = await fetch(`/api/user/` + attendee, {
                         method: "GET",
@@ -109,7 +110,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                 });
             }
 
-            if (meetup && meetup.invited && !meetupUndecided.length) {
+            if (meetup && meetup.invited.length > 0 && meetupUndecided.length != meetup.invited.length) {
 
                 const undecidedPromise = Promise.all(meetup.invited.map(async (attendee: string) => {
                     if (attendee.includes('@')) {

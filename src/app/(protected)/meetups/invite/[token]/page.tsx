@@ -1,15 +1,14 @@
 "use client";
 import useSession from "@/app/components/utils/sessionProvider";
-import Sidebar from "@/app/components/sidebar";
-import {useEffect, useState, useContext} from "react";
-import {userContext} from "@/app/providers";
-import {defaultUser, Meetup, User} from "@/types";
+import {useEffect, useState} from "react";
+import {useUser} from "@/app/providers";
+import { Meetup, User} from "@/types";
 import {Button, Skeleton} from "@nextui-org/react";
 import { useRouter } from 'next13-progressbar';
 import { Avatar } from "@nextui-org/react";
 
 export default function MeetupInvite({ params }: { params: { token: string } }){
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     const session = useSession();
     const [tokenData, setTokenData] = useState<any>(null);
     const [inviteError, setInviteError] = useState<string>("");
@@ -19,15 +18,19 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
     const router = useRouter();
 
     useEffect(() => {
-        if (!tokenData) {
-            fetch(process.env.NEXT_PUBLIC_APP_URL + '/api/auth/verify', {
+        if (!tokenData && !inviteError) {
+            fetch('/api/auth/verify', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${params.token}`
                 }
-            }).then((data) => {
-                data.json().then((tokenData) => {
+            }).then((res) => {
+                if (!res.ok){
+                    setInviteError("Invitation is invalid or expired");
+                    return;
+                }
+                res.json().then((tokenData) => {
                     setTokenData(tokenData);
                 })
             })
@@ -35,16 +38,16 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
         if (session.status == "done" && tokenData && loadingData && user) {
             setLoadingData(false);
 
-            if ("error" in tokenData || tokenData.data.type != "meetup-invitation") {
+            if ("error" in tokenData || tokenData.type != "meetup-invitation") {
                 setInviteError("Invitation is invalid or expired");
-            } else if (!tokenData.data.userID.includes('@') && tokenData.data.userID != session.session.userID) {
+            } else if (!tokenData.userID.includes('@') && tokenData.userID != session.session.userID) {
                 setInviteError("This invitation is not for you");
             } else {
-                if (tokenData.data.userID.includes('@') && tokenData.data.userID != user.email){
+                if (tokenData.userID.includes('@') && tokenData.userID != user.email){
                     setInviteError("This invitation is not for you");
                     return;
                 }
-                fetch(`/api/meetup/${tokenData.data.meetup}`, {
+                fetch(`/api/meetup/${tokenData.meetup}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -76,7 +79,7 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
                 });
             }
         }
-    }, [user, loadingData, params.token, router, session.session.token, session.session.userID, session.status, setTokenData, tokenData]);
+    }, [user, loadingData, params.token, router, session.session.token, session.session.userID, session.status, setTokenData, tokenData, inviteError]);
 
 
     function acceptInvite(){
@@ -128,8 +131,9 @@ export default function MeetupInvite({ params }: { params: { token: string } }){
 
         Promise.all([meetupUpdate, notificationCreate, userUpdate]).then(() => {
             // update user context
-            updateUser();
-            router.push(`/meetups/${meetup._id}`);
+            updateUser().then(() => {
+                router.push(`/meetups/${meetup._id}`);
+            });
         })
     }
 

@@ -1,6 +1,6 @@
 "use client";
-import {Suspense, useContext, useState} from 'react';
-import { userContext } from '@/app/providers';
+import {Suspense, useState} from 'react';
+import { useUser } from '@/app/providers';
 import { User } from '@/types';
 import useSession from "@/app/components/utils/sessionProvider";
 import { useRouter } from 'next13-progressbar';
@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import {Button, Avatar, Input, Textarea, Skeleton} from '@nextui-org/react';
 
 function GetStartedComponent(){
-    const {user, updateUser} = useContext(userContext);
+    const {user, updateUser} = useUser();
     const [updatedUser, setUpdatedUser] = useState<User | null>(null);
     const {session, status} = useSession();
     const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +25,7 @@ function GetStartedComponent(){
         "https://images.unsplash.com/photo-1602707063633-bc4308339b5c?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fG5hdGlvbmFsJTIwcGFya3N8ZW58MHx8MHx8fDA%3D",
 
     ]
+
     if (user) {
         if (!updatedUser) setUpdatedUser(user);
 

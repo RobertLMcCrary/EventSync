@@ -6,7 +6,7 @@ import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { User } from "@/types";
 import UserTooltip from "@/app/components/userTooltip";
-import { Button, Badge, Skeleton, Popover, PopoverTrigger, PopoverContent, Image, Tooltip } from "@nextui-org/react";
+import { Badge, Skeleton, Popover, PopoverTrigger, PopoverContent, Image, Tooltip } from "@nextui-org/react";
 import { useRouter } from 'next13-progressbar';
 import { useEffect, useState } from "react";
 

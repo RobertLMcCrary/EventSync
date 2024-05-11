@@ -1,4 +1,3 @@
-import { UserGroupIcon, ClockIcon, CalendarIcon } from "@heroicons/react/20/solid";
 import { Meetup, User } from "@/types";
 import {Button, Avatar, Skeleton, Image, CardHeader} from "@nextui-org/react";
 import {Card, CardBody, CardFooter} from "@nextui-org/react";

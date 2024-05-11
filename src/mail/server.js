@@ -41,8 +41,7 @@ app.post("/send-verification-email", async (req, res) => {
 
     await transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log(error);
-            res.send({message: "Error sending email"});
+            return res.status(400).json({error: "Error sending email"});
         } else {
             console.log('Email sent: ' + info.response);
             res.send({message: verificationCode});

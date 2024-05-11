@@ -45,7 +45,7 @@ async function getUpcomingEventsHandler(location: Location, interests: string[])
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data: ResponseData = await response.json();
-        const events = data.events.map(event => ({
+        return data.events.map(event => ({
             title: event.title,
             datetime_utc: event.datetime_utc,
             venue: {
@@ -59,7 +59,6 @@ async function getUpcomingEventsHandler(location: Location, interests: string[])
             },
             type: event.type
         }));
-        return events;
     } catch (error) {
         throw error;
     }
@@ -67,8 +66,7 @@ async function getUpcomingEventsHandler(location: Location, interests: string[])
 
 export async function getUpcomingEvents(location: Location, interests: string[]): Promise<Event[] | Error> {
     try {
-        const upcomingEvents = await getUpcomingEventsHandler(location, interests);
-        return upcomingEvents;
+        return await getUpcomingEventsHandler(location, interests);
     } catch (error) {
         return new Error("An error occurred while fetching upcoming events.");
     }

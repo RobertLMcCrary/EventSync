@@ -3,23 +3,17 @@ dotenv.config({ path: '.env.local' });
 import {NextRequest, NextResponse} from "next/server";
 import { createMeetup } from "@/db/create/meetup";
 import { createNotification } from "@/db/create/notification";
-import { updateUser } from "@/db/update/user";
 import { getUser } from "@/db/read/user";
 import {AppNotification, Meetup, User} from "@/types";
-import {headers} from "next/headers";
-import verifyJWT from "@/app/api/utils/verifyJWT";
 import jwt from "jsonwebtoken";
+import protectedRoute from "@/app/api/utils/protected";
+import {headers} from "next/headers";
 
 export async function POST(request: NextRequest) {
     const headersInstance = headers();
-    const authorization = headersInstance.get('authorization');
-    const data = verifyJWT(authorization);
-
-    if ("error" in data) {
-        return NextResponse.json({error: data.error})
-    }
-    if (data.type == "api"){
-        // Do additional checks for scopes
+    const isAuthorized = protectedRoute(headersInstance);
+    if (isAuthorized.status !== 200) {
+        return isAuthorized;
     }
 
     const meetupData = await request.json(); // Get user data from request body
@@ -32,7 +26,7 @@ export async function POST(request: NextRequest) {
             if (!user) {
                 if (!process.env.JWT_SECRET) {
                     // This should never happen
-                    throw new Error('JWT_SECRET is not defined');
+                    return NextResponse.json({ error: 'JWT_SECRET is not defined' }, { status: 500 });
                 }
                 const expiresIn = (meetup.date.getTime() - new Date().getTime()) / 1000 / 60; // Invitation expires when the meetup starts
                 const token = jwt.sign({ userID: attendee, meetup: meetup._id, type: 'meetup-invitation' }, process.env.JWT_SECRET, {
@@ -62,7 +56,7 @@ export async function POST(request: NextRequest) {
             await notifyUser(meetup, user)
         }
     }));
-    console.log(meetup);
+
     await createMeetup(meetup); // Create meetup in database
     return NextResponse.json(meetup.toJSON()); // Return meetup data as JSON
 }

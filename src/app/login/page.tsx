@@ -1,11 +1,12 @@
 "use client";
 import { useState, Suspense } from 'react';
-import { UserCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon, ArrowLongRightIcon } from "@heroicons/react/24/solid";
+import { UserCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from "@heroicons/react/24/solid";
 import Cookies from 'js-cookie';
 import { useRouter } from "next13-progressbar";
 import { useSearchParams } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
 import {Button, Skeleton, Input, Image} from "@nextui-org/react";
+import {useUser} from "@/app/providers";
 
 
 
@@ -17,10 +18,8 @@ function LoginComponent() {
     const [isLoading, setIsLoading] = useState(false);
     let params = useSearchParams();
     const [googleLoading, setGoogleLoading] = useState(false);
+    const {user} = useUser();
     const router = useRouter();
-
-
-
 
     function loginWithGoogle() {
         setGoogleLoading(true);
@@ -40,7 +39,7 @@ function LoginComponent() {
                 .then((res) => {
                     res.json().then((data) => {
                         setGoogleLoading(false);
-                        if (data.error) {
+                        if (!res.ok) {
                             setError(data.error);
                         } else {
                             // Redirect to dashboard
@@ -69,9 +68,12 @@ function LoginComponent() {
         }
     });
 
-    const handleSubmit = (e: { preventDefault: () => void; })  => {
+    if (user) {
+        router.push('/dashboard');
+        return (<div></div>);
+    }
 
-        // POST request to /api/auth/signup
+    const handleSubmit = (e: { preventDefault: () => void; })  => {
         e.preventDefault();
         if (!username || !password) {
             setError('Please fill in all fields');
@@ -84,24 +86,22 @@ function LoginComponent() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
-        })
-            .then((res)=> {
-                res.json().then((data) => {
-                    setIsLoading(false);
-                    if (data.error) {
-                        setError(data.error);
-                    } else {
-                        // Redirect to dashboard
-                        Cookies.set('token', data.token);
-
-                        if (params.has('redirect')) {
-                            router.push(params.get('redirect') || '/dashboard');
-                            return;
-                        }
-                        router.push('/dashboard')
-                    }
-                });
+        }).then((res)=> {
+            res.json().then((data) => {
+                setIsLoading(false);
+                if (!res.ok) {
+                    setError(data.error);
+                    return;
+                }
+                // Redirect to dashboard
+                Cookies.set('token', data.token);
+                if (params.has('redirect')) {
+                    router.push(params.get('redirect') || '/dashboard');
+                    return;
+                }
+                router.push('/dashboard')
             });
+        });
     };
 
     return (

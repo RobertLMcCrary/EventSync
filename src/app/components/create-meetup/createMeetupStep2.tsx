@@ -3,7 +3,6 @@ import {Input, Button, DatePicker} from "@nextui-org/react";
 import {
     DateValue,
 } from "@internationalized/date";
-import {I18nProvider} from "@react-aria/i18n";
 
 // Date, time, location
 export default function CreateMeetupStep2({dateTime, location, setDateTime, setLocation, changeStep} : {dateTime: DateValue, location: string, setDateTime: any, setLocation: (location: string) => void, changeStep: () => void}) {{}
