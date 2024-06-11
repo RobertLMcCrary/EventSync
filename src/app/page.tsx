@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next13-progressbar"
 import { useTheme } from "next-themes";
 
@@ -74,7 +74,7 @@ export default function Home() {
 
     useEffect(() => {
         AOS.init()
-        setTheme('light')
+        // setTheme('light')
     }, [])
 
     return (
@@ -109,7 +109,9 @@ export default function Home() {
                             <Switch
                                 size="lg"
                                 color="primary"
+                                defaultSelected
                                 onValueChange={toggleTheme}
+                                isSelected={currentTheme === 'dark'}
                             >
                             </Switch>
                         </NavbarItem>
