@@ -1,4 +1,5 @@
 import {generateSnowflake} from "../db/utils/snowflake";
+import {Announcement} from "./Announcement";
 import {defaultUser} from "./User";
 
 // TODO: Decide on the fields for a Meetup
@@ -13,6 +14,7 @@ interface MeetupParams {
     image?: string;
     invited?: string[];
     unavailable?: string[];
+    announcements?: Announcement[];
 }
 
 class Meetup {
@@ -26,8 +28,9 @@ class Meetup {
     attendees: string[]; // Array of user ids that are attending
     invited: string[]; // Array of user ids that have been invited
     unavailable: string[]; // Array of user ids that are not available but have been invited
+    announcements: Announcement[];
 
-    constructor({title, creator, description, date, location, attendees, _id, image, invited, unavailable}: MeetupParams) {
+    constructor({title, creator, description, date, location, attendees, _id, image, invited, unavailable, announcements}: MeetupParams) {
         this._id = _id? _id : generateSnowflake();
         this.title = title;
         this.description = description;
@@ -38,6 +41,7 @@ class Meetup {
         this.image = image ? image : "https://via.placeholder.com/150";
         this.invited = invited ? invited : [];
         this.unavailable = unavailable? unavailable : [];
+        this.announcements = announcements? announcements : [];
     }
 
     // Converts a Meetup instance to a JSON object

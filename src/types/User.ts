@@ -21,6 +21,8 @@ interface UserParams {
     friends?: string[];
     googleAccount?: GoogleAuth | null;
     interests?: string[];
+    outgoingFriendRequests?: string[];
+    incomingFriendRequests?: string[];
     bio?: string;
     location?: string;
 }
@@ -38,10 +40,12 @@ class User {
     friends: string[]; // Array of user ids
     googleAccount: GoogleAuth | null; // Google account information
     interests: string[]; // Array of interests
+    outgoingFriendRequests: string[]; // Array of user ids
+    incomingFriendRequests: string[];
     bio: string; // User's bio
     location: string; // User's location
 
-    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests, bio, location}: UserParams) {
+    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests, bio, location, outgoingFriendRequests, incomingFriendRequests}: UserParams) {
         this._id = _id ? _id : generateSnowflake();
         this.username = username;
         this.email = email;
@@ -54,6 +58,8 @@ class User {
         this.friends = friends ? friends : [];
         this.googleAccount = googleAccount ? googleAccount : null;
         this.interests = interests ? interests : [];
+        this.outgoingFriendRequests = outgoingFriendRequests ? outgoingFriendRequests : [];
+        this.incomingFriendRequests = incomingFriendRequests ? incomingFriendRequests : [];
         this.bio = bio ? bio : "";
         this.location = location ? location : "";
     }
@@ -73,6 +79,8 @@ class User {
             friends: this.friends,
             googleAccount: this.googleAccount,
             interests: this.interests,
+            outgoingFriendRequests: this.outgoingFriendRequests,
+            incomingFriendRequests: this.incomingFriendRequests,
             bio: this.bio,
             location: this.location,
         };
