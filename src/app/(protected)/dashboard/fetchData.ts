@@ -15,15 +15,16 @@ interface fetchParams {
     setKnownMeetups: any;
     setExpired: any;
     setGlobalError: any;
+    setVisibleMeetups: any;
 }
 
-export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired, setGlobalError} : fetchParams){
+export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired, setGlobalError, setVisibleMeetups} : fetchParams){
     if (!user) return;
     if (!knownUsers.includes(user)) setKnownUsers((prev: any) => [...prev, user]);
 
     if (status != 'done') return;
 
-    if (user.meetups && (meetups.includes(null) || meetups.length != user.meetups.length)) {
+    if (user.meetups && meetups.includes(null)) {
 
         const fetchPromises = user.meetups.map(async (meetupID: string) => {
 
@@ -50,6 +51,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
         Promise.all(fetchPromises).then((meetupsData) => {
             const validMeetups = meetupsData.filter(meetup => !('error' in meetup) && new Date().getTime() - new Date(meetup.date.toLocaleString()).getTime() <= 0);
             setMeetups(validMeetups);
+            setVisibleMeetups(validMeetups);
             setKnownMeetups((prev: any) => [...prev, ...validMeetups]);
 
             validMeetups.forEach((meetup) => {

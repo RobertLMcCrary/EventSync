@@ -6,7 +6,6 @@ import {useRouter} from "next13-progressbar";
 export default function useDashboardState() {
     const {user, updateUser} = useUser();
     const [meetups, setMeetups] = useState<(Meetup | null)[]>([null, null, null, null]);
-    const [search, setSearch] = useState('');
     const [knownUsers, setKnownUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<(AppNotification | null)[]>([null, null, null, null]);
     const [knownMeetups, setKnownMeetups] = useState<Meetup[]>([]);
@@ -20,8 +19,6 @@ export default function useDashboardState() {
         user,
         meetups,
         setMeetups,
-        search,
-        setSearch,
         knownUsers,
         setKnownUsers,
         notifications,

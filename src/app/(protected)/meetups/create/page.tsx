@@ -24,7 +24,6 @@ export default function CreateMeetup() {
         password: ""
     });
     const [friends, setFriends] = useState<(User)[]>([loadingUserObj]);
-    const [loadingUser, setLoadingUser] = useState(true);
     const [userEmail, setUserEmail] = useState("");
     const [meetupCreationLoading, setMeetupCreationLoading] = useState<0 | 1 | 2>(0); // 0 = not started, 1 = loading, 2 = done
     const session = useContext(sessionContext);
@@ -81,46 +80,35 @@ export default function CreateMeetup() {
         });
     }
 
-    if (session.status == "done" && loadingUser) {
-        fetch(`/api/user/${session.session.userID}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.session.token}`
-            }
-        }).then((data) => {
-            data.json().then((user) => {
-                setUserEmail(user.email);
+    if (user && !userEmail) {
+        setUserEmail(user.email);
 
-                if (user.friends.length == 0) {
-                    const defaultFriendsUser = new User({
-                        _id: "0",
-                        username: "",
-                        email: "",
-                        password: ""
-                    })
-                    setFriends([
-                        defaultFriendsUser
-                    ])
-                    return;
+        if (user.friends.length == 0) {
+            const defaultFriendsUser = new User({
+                _id: "0",
+                username: "",
+                email: "",
+                password: ""
+            })
+            setFriends([
+                defaultFriendsUser
+            ])
+            return;
+        }
+        const friendPromises = user.friends.map(async (friendID: string) => {
+            const res = await fetch(`/api/user/${friendID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.token}`
                 }
-                const friendPromises = user.friends.map(async (friendID: string) => {
-                    const res = await fetch(`/api/user/${friendID}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.session.token}`
-                        }
-                    });
-                    return await res.json();
-                });
-
-                Promise.all(friendPromises).then((friendsList) => {
-                    setFriends(friendsList);
-                });
             });
+            return await res.json();
         });
-        setLoadingUser(false);
+
+        Promise.all(friendPromises).then((friendsList) => {
+            setFriends(friendsList);
+        });
     }
 
     function changeStep(){

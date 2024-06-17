@@ -136,6 +136,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const attendeeData = formatAttendeesString(meetupAttendees, user);
     const undecidedData = formatMemberString(meetupUndecided);
     const unavailableData = formatMemberString(meetupUnavailable);
+
     return (
         <div className="flex items-center h-[calc(100vh-80px)] justify-center align-middle  p-4 md:p-8">
             <Card className="w-full h-full">
@@ -186,7 +187,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                 <div className="flex mt-1 w-full">
                                     <MapPinIcon
                                         className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all"/>
-                                    {meetup? <h2>{meetup.location}</h2> : <Skeleton className="w-[4/5] h-4 rounded-lg"/>}
+                                    {meetup? <a className="text-blue-500 hover:text-blue-600 hover:text-underline" href={"https://google.com/maps?q="+meetup.location}>{meetup.location}</a> : <Skeleton className="w-[4/5] h-4 rounded-lg"/>}
                                 </div>
                             </div>
                             <div className="my-6">

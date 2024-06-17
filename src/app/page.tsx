@@ -78,9 +78,9 @@ export default function Home() {
     }, [])
 
     return (
-        <div className="bg-white dark:bg-black">
-
-            <Navbar isBlurred maxWidth="full" className="bg-gray-200 dark:bg-slate-900">
+        <div className="bg-white w-screen ">
+            <div className="bg-gradient-to-b from-blue-500/30 via-green-500/30 to-red-500/30">
+            <Navbar maxWidth="full" className="h-20 bg-white/50 backdrop-blur dark:bg-black/50 drop-shadow-lg">
                 <NavbarContent>
                     <NavbarContent justify="start">
                         <NavbarBrand>
@@ -137,25 +137,35 @@ export default function Home() {
             </Navbar>
 
 
-            <section className="flex flex-col items-center justify-center h-[100vh] text-center bg-gradient-to-b from-gray-200 to-white  dark:from-slate-900 dark:to-black">
-                <h1 data-aos="fade-right" data-aos-duration="700" className="text-[4vw] text-slate-900 dark:text-white font-bold mb-10">Connect, Plan, and Hang Out!</h1>
-                <h2 data-aos="fade-left" data-aos-duration="700" className="text-[3vw] text-slate-900 dark:text-white">Bringing Friends Together Has Never Been Easier</h2>
+            <section className="flex justify-center items-center h-[calc(100vh-80px)] dark:from-slate-900 dark:to-black">
+                <div className="flex flex-col text-center">
+                    <h1 data-aos="fade-right" data-aos-duration="700" className="md:text-9xl text-8xl bg-clip-text h-40 text-transparent bg-gradient-to-r from-green-500/60 to-blue-500 font-bold md:mb-4">EventSync</h1>
+                    <h2 data-aos="fade-left" data-aos-duration="700" className="md:text-2xl text-lg font-bold text-black/30 dark:text-white">Bringing <span className="bg-gradient-to-r bg-clip-text from-blue-500 to-green-500 text-transparent">friends</span> together has never been easier</h2>
+                </div>
             </section>
 
 
-            <section className="text-center items-center mb-[25vh] mx-[5vw]">
-                <h1 data-aos="fade-right" data-aos-duration="1000" className="text-[4vw] font-bold">What is EventSync?</h1>
-                <p data-aos="fade-left" data-aos-duration="1000" className="text-[3vh] text-center">
-                    EventSync is your all-in-one solution for effortless event planning and
-                    coordination. Our platform simplifies the process of organizing memorable
-                    gatherings with friends, offering intuitive tools for scheduling,
-                    location sharing, attendee management, and real-time notifications. With
-                    EventSync, you can easily connect with friends, plan hangouts, and create
-                    unforgettable experiences, making every event a special celebration of friendship
-                    and joy. Say goodbye to the hassle of coordinating events and hello to seamless
-                    socializing with EventSync!
+
+            <section className="items-center p-4 mb-[25vh] mx-[5vw]">
+                <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Hang Out</h1>
+                <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
+                    Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
                 </p>
             </section>
+
+                <section className="items-center p-4 mb-[25vh] mx-[5vw]">
+                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Connect</h1>
+                    <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
+                        Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
+                    </p>
+                </section>
+
+                <section className="items-center p-4 mb-[25vh] mx-[5vw]">
+                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Plan</h1>
+                    <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
+                        Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
+                    </p>
+                </section>
 
 
             <section className="gap-4 grid grid-cols-1 sm:grid-cols-3 mx-4">
@@ -187,6 +197,7 @@ export default function Home() {
                 )}
                 <Link onClick={() => router.push("/about")} className="cursor-pointer text-black dark:text-white mr-4">About Us</Link>
             </section>
+            </div>
         </div>
     );
 

@@ -1,6 +1,6 @@
 "use client";
 import MeetupCard from "@/app/components/meetupCard";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {Input, Button, Link} from "@nextui-org/react";
 import {MagnifyingGlassIcon, PlusIcon} from "@heroicons/react/24/solid";
 import NotificationCard from "@/app/components/notification";
@@ -9,7 +9,9 @@ import fetchData from './fetchData';
 
 
 export default function Dashboard() {
-    const { user, meetups, setMeetups, search, setSearch, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired, setGlobalError} = useDashboardState();
+    const { user, meetups, setMeetups, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired, setGlobalError} = useDashboardState();
+    const [visibleMeetups, setVisibleMeetups] = useState(meetups);
+    const [meetupsSearch, setMeetupsSearch] = useState("");
 
     useEffect(() => {
         fetchData({
@@ -26,7 +28,8 @@ export default function Dashboard() {
             knownMeetups,
             setKnownMeetups,
             setExpired,
-            setGlobalError
+            setGlobalError,
+            setVisibleMeetups
         });
     }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups, setExpired, setGlobalError]);
 
@@ -61,6 +64,15 @@ export default function Dashboard() {
 
     }
 
+    useEffect(() => {
+        if (meetupsSearch.length == 0) {
+            setVisibleMeetups(meetups);
+            return;
+        } else {
+            setVisibleMeetups(meetups.filter((meetup) => meetup?.title.toLowerCase().includes(meetupsSearch.toLowerCase())));
+        }
+    }, [meetupsSearch]);
+
     return (
             <div className="flex md:flex-row flex-col w-full flex-grow h-full md:h-[calc(100vh-80px)] justify-between pr-4 py-4 md:p-4 ">
                 <div className="mx-4 md:mx-0 dark:border-stone-800 dark:border relative max-h-screen w-[calc(100%-16px)] md:w-1/2 rounded-lg bg-white dark:bg-stone-900 flex flex-col ">
@@ -75,15 +87,15 @@ export default function Dashboard() {
                     <div className="p-4 pt-0 h-14 border-b border-stone-200 dark:border-none">
                     <Input
                         placeholder="Search"
-                        value={search}
+                        value={meetupsSearch}
                         className="w-full "
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => setMeetupsSearch(e.target.value)}
                         startContent={<MagnifyingGlassIcon width={20} height={20}/>}
                     />
                     </div>
 
                     <div className={(meetups.length > 0 ? "grid gap-4 lg:grid-cols-2 grid-cols-1 w-full " : "p-4 pt-4 flex  w-full justify-center items-center") + " bg:stone-100 p-4 h-[calc(100%-200px)] overflow-y-scroll"}>
-                        { meetups.map((meetup, index) => (
+                        { visibleMeetups.map((meetup, index) => (
                             <div key={index} className="w-full">
                                 <MeetupCard meetup={meetup} creator={knownUsers.find((user) => user._id == meetup?.creator) || null} small={true} key={index}/>
                             </div>
@@ -115,9 +127,7 @@ export default function Dashboard() {
                         <div className="p-4 pt-0 h-14">
                             <Input
                                 placeholder="Search"
-                                value={search}
                                 className="w-full "
-                                onChange={(e) => setSearch(e.target.value)}
                                 startContent={<MagnifyingGlassIcon width={20} height={20}/>}
                             />
                         </div>

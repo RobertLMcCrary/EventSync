@@ -64,11 +64,8 @@ function GetStartedComponent(){
             setIsLoading(false);
             if (res.ok) {
                 updateUser();
-                if (searchParams.has('redirect')) {
-                    router.push(searchParams.get('redirect') || 'dashboard');
-                } else {
-                    router.push('/dashboard');
-                }
+                router.push('/dashboard');
+
             } else {
                 res.json().then((data) => {
                     setError(data.error);

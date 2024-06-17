@@ -28,10 +28,10 @@ export default function Sidebar({ active, user, expanded, setExpanded, sidebarRe
         }
     }, [user]);
 
-    let asideClasses = " relative  h-screen hidden  w-24 flex-shrink-0 md:flex flex-col xl:w-64 border-r border:neutral-200 dark:border-neutral-800 bg-white dark:bg-black";
+    let asideClasses = " relative fixed h-screen hidden  w-24 flex-shrink-0 md:flex flex-col xl:w-64 border-r border:neutral-200 dark:border-neutral-800 bg-white dark:bg-black";
 
     if (expanded){
-        asideClasses = "absolute z-20 h-screen flex-shrink-0 flex flex-col w-64 border-r border:neutral-200 dark:border-neutral-800 bg-white dark:bg-black";
+        asideClasses = "absolute z-20 h-screen fixed flex-shrink-0 flex flex-col w-64 border-r border:neutral-200 dark:border-neutral-800 bg-white dark:bg-black";
     }
 
     return (
