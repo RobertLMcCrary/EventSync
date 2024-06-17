@@ -107,10 +107,11 @@ function About() {
                 <NavbarContent justify="center">
                     <NavbarItem>
                         <Switch
-                            defaultSelected
                             size="lg"
                             color="primary"
+                            defaultSelected
                             onValueChange={toggleTheme}
+                            isSelected={currentTheme === 'dark'}
                         >
                         </Switch>
                     </NavbarItem>
