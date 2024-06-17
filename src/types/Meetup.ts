@@ -56,7 +56,8 @@ class Meetup {
             attendees: this.attendees,
             invited: this.invited,
             image: this.image,
-            unavailable: this.unavailable
+            unavailable: this.unavailable,
+            announcements: this.announcements.map(announcement => announcement.toJSON())
         };
     }
 }

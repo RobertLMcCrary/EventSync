@@ -11,11 +11,12 @@ import {
 } from "@heroicons/react/24/outline";
 import {useRouter} from "next13-progressbar";
 import {Meetup, User} from "@/types";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useContext} from "react";
 import {useUser, sessionContext} from "@/app/providers";
 import formatAttendeesString from "@/app/(protected)/meetups/formatAttendeesString";
 import formatMemberString from "@/app/(protected)/meetups/formatMemberString";
+import AnnouncementCard from "@/app/components/Announcement";
 
 export default function MeetupProfile({params}: { params: { id: string } }) {
     const {user, updateUser} = useUser();
@@ -32,6 +33,32 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const router = useRouter();
     const [loadingData, setLoadingData] = useState<boolean>(true);
 
+
+    function getAnnouncementCreator(userID: string) {
+        if (userID == meetup?.creator) {
+            return meetupCreator;
+        }
+
+        let creator =  meetupAttendees.find((attendee) => attendee._id == userID);
+
+        if (creator) {
+            return creator;
+        }
+
+        creator = meetupUnavailable.find((attendee) => attendee._id == userID);
+
+        if (creator) {
+            return creator;
+        }
+
+        creator = meetupUndecided.find((attendee) => attendee._id == userID);
+
+        if (creator) {
+            return creator;
+        }
+
+        return null;
+    }
 
     // Get TOKEN from cookie
     const {session, status} = useContext(sessionContext);
@@ -136,6 +163,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const attendeeData = formatAttendeesString(meetupAttendees, user);
     const undecidedData = formatMemberString(meetupUndecided);
     const unavailableData = formatMemberString(meetupUnavailable);
+
 
     return (
         <div className="flex items-center h-[calc(100vh-80px)] justify-center align-middle  p-4 md:p-8">
@@ -323,49 +351,9 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     </button>
                                 </div>
                                 <div className="md:overflow-y-scroll md:h-[15rem]">
-                                    <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                                        <div className="flex align-middle text-sm text-gray-700 mb-1">
-                                            <img
-                                                src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
-                                                className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
-                                            />
-                                            <span>[name]</span>
-                                        </div>
-                                        <p>
-                                            auctor lectus eget pulvinar pellentesque. Suspendisse
-                                            sollicitudin vulputate justo, ut venenatis metus
-                                            posuere at. Duis tempor aliqua.
-                                        </p>
-                                    </div>
-                                    <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                                        <div className="flex align-middle text-sm text-gray-700 mb-1">
-                                            <img
-                                                src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
-                                                className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
-                                            />
-                                            <span>[name]</span>
-                                        </div>
-                                        <p>
-                                            lputate justo, ut venenatis metus posuere at. Duis
-                                            tempor aliquam nibh, elementum magna finibus quis.
-                                            Proin cursus ultrices bibendum.
-                                        </p>
-                                    </div>
-                                    <div className="border-b border-gray-300 dark:border-gray-700 px-1 pb-3 mb-3">
-                                        <div className="flex align-middle text-sm text-gray-700 mb-1">
-                                            <img
-                                                src="https://cdn.download.ams.birds.cornell.edu/api/v1/asset/612763581/1800"
-                                                className="border-[1.5px] border-gray-500 w-5 h-5 object-cover rounded-full z-10 mr-1.5"
-                                            />
-                                            <span>[name]</span>
-                                        </div>
-                                        <p>
-                                            Quisque et malesuada dolor, porta aliquam dolor. In
-                                            posuere, sapien at tristique aliquam, orci quam
-                                            maximus ipsum, sed viverra eros elit ac eros. Donec
-                                            pretium, est ut viv.
-                                        </p>
-                                    </div>
+                                    {(meetup? meetup.announcements : [null, null, null, null]).map((announcement, index) => (
+                                        <AnnouncementCard announcement={announcement} creator={announcement ? getAnnouncementCreator(announcement.creator) : null} key={index}/>
+                                    ))}
                                 </div>
                             </div>
                         </div>
