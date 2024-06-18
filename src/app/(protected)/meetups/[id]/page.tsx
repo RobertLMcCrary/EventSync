@@ -10,7 +10,7 @@ import {
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {useRouter} from "next13-progressbar";
-import {Meetup, User} from "@/types";
+import {Announcement, Meetup, User} from "@/types";
 import {useEffect, useMemo, useState} from "react";
 import {useContext} from "react";
 import {useUser, sessionContext} from "@/app/providers";
@@ -164,6 +164,54 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const undecidedData = formatMemberString(meetupUndecided);
     const unavailableData = formatMemberString(meetupUnavailable);
 
+    async function createAnnouncement(e){
+        e.preventDefault();
+        console.log(announcementInput);
+        if (announcementInput == ""){
+            return;
+        }
+        if (!user || !meetup){
+            return;
+        }
+
+        const res = await fetch('/api/meetup/'+meetup._id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.token}`
+            },
+            body: JSON.stringify({
+                $push: {
+                    announcements: {
+                        creator: user._id,
+                        content: announcementInput
+                    }
+                }
+            })
+        });
+
+        if (!res.ok){
+            console.log("error creating announcement");
+            return;
+        }
+
+        const res2 = await fetch('/api/notification/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.token}`
+            },
+            body: JSON.stringify({
+                initiator: user._id,
+                type: 10,
+                meetup: meetup._id,
+                buttonHREF: `/meetup/${meetup._id}`
+            })
+        });
+
+        const data = await res.json();
+        setMeetup(data);
+    }
 
     return (
         <div className="flex items-center h-[calc(100vh-80px)] justify-center align-middle  p-4 md:p-8">
@@ -320,9 +368,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     />
                                     <button
                                         className="ml-3"
-                                        onClick={() => {
-                                            console.log("Clicked 'Add announcement'!");
-                                        }}
+                                        onClick={createAnnouncement}
                                     >
                                         <PaperAirplaneIcon
                                             className="block w-6 h-6 text-gray-500 hover:text-gray-400 mr-1 transition-all"/>
@@ -352,7 +398,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                 </div>
                                 <div className="md:overflow-y-scroll md:h-[15rem]">
                                     {(meetup? meetup.announcements : [null, null, null, null]).map((announcement, index) => (
-                                        <AnnouncementCard announcement={announcement} creator={announcement ? getAnnouncementCreator(announcement.creator) : null} key={index}/>
+                                        <AnnouncementCard announcement={announcement as Announcement } creator={announcement ? getAnnouncementCreator(announcement.creator) : null} key={index}/>
                                     ))}
                                 </div>
                             </div>

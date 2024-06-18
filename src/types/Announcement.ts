@@ -1,8 +1,7 @@
 import {generateSnowflake} from "../db/utils/snowflake";
 
 interface AnnouncementParams {
-    title: string;
-    description: string;
+    content: string;
     creator: string;
     date?: Date;
     _id?: string;
@@ -10,25 +9,22 @@ interface AnnouncementParams {
 
 export class Announcement {
     _id: string;
-    title: string;
-    description: string;
+    content: string;
     creator: string;
     date: Date;
 
-    constructor({title, description, creator, date, _id}: AnnouncementParams) {
+    constructor({content, creator, date, _id}: AnnouncementParams) {
         this._id = _id? _id : generateSnowflake();
-        this.title = title;
-        this.description = description;
+        this.content = content
         this.creator = creator;
         this.date = date? date : new Date();
     }
 
     // Converts an Announcement instance to a JSON object
-    toJSON(): any {
+    toJSON() {
         return {
             _id: this._id,
-            title: this.title,
-            description: this.description,
+            content: this.content,
             creator: this.creator,
             date: this.date
         };

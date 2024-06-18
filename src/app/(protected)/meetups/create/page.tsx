@@ -17,6 +17,7 @@ export default function CreateMeetup() {
     const [dateTime, setDateTime] = useState(now(getLocalTimeZone()));
     const [location, setLocation] = useState("");
     const [attendees, setAttendees] = useState<User[]>([]);
+    const [image, setImage] = useState("");
     const loadingUserObj = new User({
         _id: "loading",
         username: "",
@@ -46,7 +47,7 @@ export default function CreateMeetup() {
                         description: description,
                         date: dateTime.toDate(),
                         location: location,
-                        invited: attendees.map((user) => user.email)
+                        invited: attendees.map((user) => user.email),
                     }
                 })
             }).then(response => {
@@ -57,6 +58,7 @@ export default function CreateMeetup() {
                 })
                 .catch(error => console.error('Error:', error));
         }
+        console.log(image, attendees);
         fetch('/api/meetup/create', {
             method: 'POST',
             headers: {
@@ -69,7 +71,8 @@ export default function CreateMeetup() {
                 date: dateTime.toDate(),
                 location: location,
                 creator: session.session.userID,
-                invited: attendees.map((user) => user._id)
+                invited: attendees.map((user) => user._id),
+                image: image,
             })
         }).then((data) => {
             data.json().then((meetup) => {
@@ -122,7 +125,7 @@ export default function CreateMeetup() {
                 { step > 1 ? <BreadcrumbItem onClick={()=>setStep(2)}>Location & Time</BreadcrumbItem> : null}
                 { step > 2 ? <BreadcrumbItem onClick={()=>setStep(2)}>Attendees</BreadcrumbItem> : null}
             </Breadcrumbs>
-            {step == 1 ? <CreateMeetupStep1 name={name} description={description} setName={setName} setDescription={setDescription} changeStep={changeStep}/> : null}
+            {step == 1 ? <CreateMeetupStep1 name={name} description={description} setName={setName} setDescription={setDescription} changeStep={changeStep} image={image} setImage={setImage}/> : null}
             {step == 2 ? <CreateMeetupStep2 location={location} dateTime={dateTime} changeStep={changeStep} setLocation={setLocation} setDateTime={setDateTime}/> : null}
             {step == 3 ? <CreateMeetupStep3 attendees={attendees} createMeetup={createMeetup} meetupCreationLoading={meetupCreationLoading} userEmail={userEmail} setAttendees={setAttendees} friends={friends}/> : null}
         </div>

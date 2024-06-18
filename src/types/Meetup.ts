@@ -14,7 +14,7 @@ interface MeetupParams {
     image?: string;
     invited?: string[];
     unavailable?: string[];
-    announcements?: Announcement[];
+    announcements?: (Announcement | Record<string, any>)[];
 }
 
 class Meetup {
@@ -28,7 +28,7 @@ class Meetup {
     attendees: string[]; // Array of user ids that are attending
     invited: string[]; // Array of user ids that have been invited
     unavailable: string[]; // Array of user ids that are not available but have been invited
-    announcements: Announcement[];
+    announcements: (Announcement | Record<string, any>)[];
 
     constructor({title, creator, description, date, location, attendees, _id, image, invited, unavailable, announcements}: MeetupParams) {
         this._id = _id? _id : generateSnowflake();
@@ -41,11 +41,24 @@ class Meetup {
         this.image = image ? image : "https://via.placeholder.com/150";
         this.invited = invited ? invited : [];
         this.unavailable = unavailable? unavailable : [];
-        this.announcements = announcements? announcements : [];
+
+        if (announcements) {
+            this.announcements = announcements.map(announcement => {
+                if (announcement instanceof Announcement) {
+                    return announcement;
+                } else {
+                    return new Announcement(announcement);
+                }
+            });
+        } else {
+            this.announcements = [];
+        }
+
     }
 
     // Converts a Meetup instance to a JSON object
     toJSON(): any {
+        console.log(this.announcements);
         return {
             _id: this._id,
             title: this.title,

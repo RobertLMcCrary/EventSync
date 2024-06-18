@@ -9,13 +9,13 @@ export default function AnnouncementCard({announcement, creator}: Readonly<{anno
             {announcement && creator ?
                 <div className="flex flex-col w-full mt-1">
                     <div className="flex flex-row items-center justify-between gap-2">
-                        <h1 className="text-lg font-semibold">{announcement.title}</h1>
                         <div className="flex flex-row w-1/4 items-center gap-2">
                             <Avatar src={creator.avatar} alt={creator.username} className="min-w-6 h-6 rounded-full"/>
                             <p className="text-xs text-gray-500">{creator.username}</p>
                         </div>
+                        <p className="dark:text-gray-300 text-black font-bold">{announcement.content}</p>
                     </div>
-                    <p className="">{announcement.description}</p>
+
                 </div>
                 :
                 <div className="flex flex-col w-full mt-1">
