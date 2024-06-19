@@ -59,28 +59,28 @@ export function Providers({children}: { children: React.ReactNode }) {
 
 
     const updateUser = useCallback(async () => {
-        if (expired) return;
-        fetch(`/api/user/${session.session.userID}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.session.token}`
-            },
-        }).then((res) => {
-            if (!res.ok) {
-                console.log("update user error");
-                setExpired(true);
-                return;
-            }
-            res.json().then((userData) => {
-                setUser(userData);
-                setTheme(userData.theme);
-            });
+    console.log("loading user");
+    if (expired) return;
+    fetch(`/api/user/${session.session.userID}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.session.token}`
+        },
+    }).then((res) => {
+        if (!res.ok) {
+            console.log("update user error");
+            setExpired(true);
+            return;
+        }
+        res.json().then((userData) => {
+            setUser(userData);
+            setTheme(userData.theme);
         });
-    }, [expired, session.session.token, session.session.userID, setTheme]);
+    });
+}, [session.session.token, session.session.userID, expired, setTheme, setUser]);
 
     useEffect(() => {
-        console.log(pathname, expired);
         // Only fetch user data if the route is protected
         if (!PROTECTED_ROUTES.map((route) => pathname.startsWith(route)).includes(true)) {
             setExpired(false);
@@ -115,14 +115,18 @@ export function Providers({children}: { children: React.ReactNode }) {
             })
         });
 
+    }, [expired, router, session.session.token, session.session.userID, session.status, setTheme, updateUser, user, pathname]);
+
+
+    useEffect(() => {
 
         const intervalId = setInterval(async () => {
             await updateUser();
-        }, 1000 * 60 * 5);
+        }, 1000 * 10);
 
         return () => clearInterval(intervalId);
 
-    }, [expired, router, session.session.token, session.session.userID, session.status, setTheme, updateUser, user, pathname]);
+        }, [updateUser, user]);
 
     return (
         <NextUIProvider navigate={router.push}>

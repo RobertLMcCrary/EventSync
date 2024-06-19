@@ -2,11 +2,12 @@
 "use client";
 import { useUser, sessionContext } from "@/app/providers";
 import {Button, Input, Tab, Tabs, useDisclosure} from "@nextui-org/react";
-import {MagnifyingGlassIcon, PlusIcon} from "@heroicons/react/24/solid";
+import {CheckIcon, MagnifyingGlassIcon, PlusIcon, XMarkIcon} from "@heroicons/react/24/solid";
 import {UserCard} from "@/app/components/UserCard";
 import AddFriendModal from "@/app/components/AddFriendModal";
 import {useEffect, useState, useContext} from "react";
 import {User} from "@/types";
+
 
 
 export default function Friends() {
@@ -17,8 +18,6 @@ export default function Friends() {
     const [incomingRequests, setIncomingRequests] = useState<(User | null)[]>([null, null, null, null]);
     const [outgoingRequests, setOutgoingRequests] = useState<(User | null)[]>([null, null, null, null]);
 
-
-    console.log(user);
 
     useEffect(() => {
         if (!user) return;
@@ -86,8 +85,9 @@ export default function Friends() {
     }, [user, friends, session.session.token, incomingRequests, outgoingRequests]);
 
 
-    async function acceptFriendRequest(friend: User) {
+    async function acceptFriendRequest(friend: User | null) {
         if (!user) return;
+        if (!friend) return
 
         const res = await fetch(`/api/user/${user._id}`, {
             method: 'PUT',
@@ -137,10 +137,13 @@ export default function Friends() {
                 type: 4,
             })
         });
+
+        await updateUser();
     }
 
-    async function declineFriendRequest(friend: User) {
+    async function declineFriendRequest(friend: User | null) {
         if (!user) return;
+        if (!friend) return;
 
         const res = await fetch(`/api/user/${user._id}`, {
             method: 'PUT',
@@ -186,9 +189,65 @@ export default function Friends() {
         });
 
         await updateUser();
+
         return;
     }
 
+
+    async function cancelFriendRequest(friend: User | null) {
+        if (!user) return;
+        if (!friend) return;
+
+        const res = await fetch(`/api/user/${user._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`,
+            },
+            body: JSON.stringify({
+                update: {
+                    $pull: {
+                        outgoingFriendRequests: friend._id
+                    }
+                }
+            })
+
+        });
+
+        const res2 = await fetch(`/api/user/${friend._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`,
+            },
+            body: JSON.stringify({
+                update: {
+                    $pull: {
+                        incomingFriendRequests: user._id
+                    }
+                }
+            })
+        });
+
+        const res3 = await fetch(`/api/notification/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`,
+            },
+            body: JSON.stringify({
+                initiator: user._id,
+                receiver: friend._id,
+                type: 6,
+            })
+        });
+
+        await updateUser();
+
+        setOutgoingRequests((outgoingRequests) => outgoingRequests.filter((request) => request !== friend));
+
+        return;
+    }
 
     return (
       <>
@@ -212,8 +271,10 @@ export default function Friends() {
                         <Tab title="Received">
                             <div className="flex flex-col gap-4 mt-4">
                                 {incomingRequests.map((request, index) => (
-                                    <div key={index} className="dark:border dark:border-gray-800 rounded-xl">
+                                    <div key={index} className="dark:border dark:border-gray-800 rounded-xl relative">
                                         <UserCard user={request} key={index}/>
+                                        <CheckIcon onClick={() => acceptFriendRequest(request)} className="h-6 w-6 absolute top-4 right-4 text-green-500 cursor-pointer"/>
+                                        <XMarkIcon onClick={() => declineFriendRequest(request)} className="h-6 w-6 absolute top-4 right-12 text-red-500 cursor-pointer"/>
                                     </div>
                                 ))}
                             </div>
@@ -222,8 +283,9 @@ export default function Friends() {
                         <Tab title="Sent">
                             <div className="flex flex-col gap-4 mt-4">
                                 {outgoingRequests.map((request, index) => (
-                                    <div key={index} className="dark:border dark:border-gray-800 rounded-xl">
+                                    <div key={index} className="dark:border relative dark:border-gray-800 rounded-xl">
                                         <UserCard user={request} key={index}/>
+                                        <XMarkIcon onClick={() => cancelFriendRequest(request)} className="h-6 w-6 absolute top-4 right-4 text-red-500 cursor-pointer"/>
                                     </div>
                                 ))}
                             </div>
