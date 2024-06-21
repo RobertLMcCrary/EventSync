@@ -11,6 +11,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Event Sync",
   description: "Insert slogan",
+viewport: "width=device-width, initial-scale=1",
+lang: "en",
+themeColor: "#000000",
+favicon: "/favicon.ico",
+    "og:title": "Event Sync",
 };
 
 export default function RootLayout({

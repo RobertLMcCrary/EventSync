@@ -75,7 +75,7 @@ export default function Dashboard() {
 
     return (
             <div className="flex md:flex-row flex-col w-full flex-grow h-full md:h-[calc(100vh-80px)] justify-between pr-4 py-4 md:p-4 ">
-                <div className="mx-4 md:mx-0 dark:border-stone-800 dark:border relative max-h-screen w-[calc(100%-16px)] md:w-1/2 rounded-lg bg-white dark:bg-stone-900 flex flex-col ">
+                <div className="mx-4 md:mx-0  relative max-h-screen w-[calc(100%-16px)] md:w-1/2 rounded-xl bg-white dark:bg-neutral-900 flex flex-col ">
                     <div className="flex flex-row p-4 justify-between h-16">
 
                         <h1 className="text-xl grow font-semibold ">Upcoming Meetups</h1>
@@ -116,7 +116,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className="flex flex-col mt-4 mr-4 md:mr-0 w-full md:mt-0 md:w-1/2 h-full pr-4">
-                    <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full ml-4 h-full md:h-1/2 max-h-screen overflow-auto rounded-lg  bg-white flex flex-col">
+                    <div className="relative dark:bg-neutral-900  w-full ml-4 h-full md:h-1/2 max-h-screen overflow-auto rounded-xl  bg-white flex flex-col">
                         <div className="flex flex-row p-4 justify-between">
                             <h1 className="lg:text-xl md:text-lg text-base font-semibold">Recent Notifications</h1>
                             <Link onClick={() => router.push('/notifications')}>
@@ -137,9 +137,9 @@ export default function Dashboard() {
                             ))}
                         </div>
                     </div>
-                    <div className="relative dark:bg-stone-900 dark:border dark:border-stone-800 w-full mt-4 ml-4 md:h-1/2 h-full overflow-auto rounded-lg  bg-white flex flex-col">
+                    <div className="relative dark:bg-neutral-900 w-full mt-4 ml-4 md:h-1/2 h-full overflow-auto rounded-xl  bg-white flex flex-col">
                         <div className="flex flex-row p-4 justify-between">
-                            <h1 className="text-xl font-semibold">IDeas ?</h1>
+                            <h1 className="text-xl font-semibold">Friends</h1>
                         </div>
                     </div>
                 </div>

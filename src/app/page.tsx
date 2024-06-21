@@ -108,7 +108,7 @@ export default function Home() {
                             <h1>EventSync</h1>
                         </NavbarBrand>
                     </NavbarContent>
-                    <NavbarContent justify="center">
+                    <NavbarContent justify="end">
                         <NavbarItem>
                             <Switch
                                 size="lg"
@@ -119,19 +119,11 @@ export default function Home() {
                             >
                             </Switch>
                         </NavbarItem>
-                    </NavbarContent>
-                    <NavbarContent justify="end">
                         <NavbarItem>
-                            <Link onClick={() => router.push("/about")} className="cursor-pointer text-black dark:text-white">About Us</Link>
+                            <Link onClick={() => router.push("/about")} className="cursor-pointer text-black bg-gradient-to-b bg-clip-text text-transparent dark:from-white dark:to-gray-400 font-bold">About</Link>
                         </NavbarItem>
                         <NavbarItem>
-                            <div className="relative">
-                                <div className="rounded-xl absolute p-2 z-40 bg-gray-950 backdrop-blur w-24 h-10">
-                                    hi
-                                </div>
-                                <div className="absolute top-0 left-0 w-24 h-10 bg-gradient-to-r from-purple-500 to-blue-500 blur">
-                                </div>
-                            </div>
+                            <Button onClick={() => router.push("/signup")} color="primary" variant="flat">Signup</Button>
                         </NavbarItem>
                     </NavbarContent>
                 </NavbarContent>
@@ -151,80 +143,47 @@ export default function Home() {
 
 
             <section className="flex justify-center relative items-center h-[calc(100vh-80px)] dark:bg-black">
-                <div className="absolute top-16 left-16 rounded-xl rotate-12 w-52 h-min">
+                <div  id="n1" className="absolute hidden md:block z-50 top-16 left-16 rounded-xl rotate-12 w-52 h-min">
                     <NotificationCard notification={defaultNotification} className="dark:bg-neutral-900 rounded-xl shadow-xl" initiator={defaultUser} meetup={defaultMeetup} onClick={() => {return}}/>
                 </div>
-                <div className="absolute bottom-16 right-16 rounded-xl -rotate-12 w-52 h-min">
+                <div id="m1" className="absolute bottom-16 hidden md:block right-16 rounded-xl -rotate-12 w-52 h-min">
                     <MeetupCard small creator={defaultUser} meetup={defaultMeetup}/>
                 </div>
-                <div className="absolute bottom-16 left-16 rounded-xl -rotate-6 w-64 h-min">
+                <div id="u1" className="absolute bottom-16 left-16 rounded-xl -rotate-6 w-64 h-min">
                     <UserCard user={defaultUser}/>
                 </div>
-                <div className="absolute top-8 right-8 rounded-xl rotate-3 w-72 h-min">
+                <div id="n2" className="absolute top-8 right-8 rotate-3 rounded-xl w-72 h-min">
                     <NotificationCard notification={defaultNotification2} className="dark:bg-neutral-900 rounded-xl " initiator={defaultUser} meetup={defaultMeetup} onClick={() => {return}}/>
                 </div>
-                <div className="flex flex-col text-center items-center">
-                    <h1 data-aos="fade-right" data-aos-duration="700" className="text-5xl w-2/3 bg-clip-text h-32 text-transparent bg-gradient-to-b text-wrap from-white to-gray-500 font-semibold ">Never miss a moment with EventSync</h1>
+                <div className="flex flex-col text-center p-4 items-center">
+                    <h1 data-aos="fade-right" data-aos-duration="700" className="text-4xl md:text-5xl md:w-2/3 bg-clip-text h-32 text-transparent bg-gradient-to-b text-wrap from-white to-gray-500 font-semibold ">Never miss a moment with EventSync</h1>
                     <h2 data-aos="fade-left" data-aos-duration="700" className="text-lg text-black/30 dark:text-gray-400">Bringing <span className="font-bold">people</span> together has never been easier</h2>
                 </div>
             </section>
 
-
-
-            <section className="items-center p-4 mb-[25vh] mx-[5vw]">
+            <section className="items-center p-4 mb-[12vh] mx-[5vw]">
                 <h1 data-aos="fade-right" data-aos-duration="1000" className="text-7xl text-transparent bg-clip-text bg-gradient-to-b h-32 from-white to-gray-500 font-bold">Plan Easily</h1>
 
-                <p data-aos-duration="1000" className="text-xl font-semibold mb-4 dark:text-gray-300 text-black/50">
-                    Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
+                <p data-aos-duration="1000" className="text-xl font-semibold mb-4 dark:text-gray-400 text-black/50">
+                    Plan and create hangouts, meetups, and memorable get-togethers effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
                 </p>
                 <img src="/Meetup-Dark.png" alt="meetup"/>
             </section>
 
                 <section className="items-center p-4 mb-[25vh] mx-[5vw]">
-                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Connect</h1>
+                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-7xl text-transparent bg-clip-text bg-gradient-to-b h-32 from-white to-gray-500 font-bold">Connect</h1>
 
-                    <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
-                        Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
+                    <p data-aos-duration="1000" className="text-xl mb-4 font-semibold dark:text-gray-400 text-black/50">
+                        Instantly share meetups with friends and family. Additionally create friend groups, manage your friends list, and collaborate on event planning [COMING SOON]
                     </p>
-                </section>
 
-                <section className="items-center p-4 mb-[25vh] mx-[5vw]">
-                    <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Plan</h1>
-                    <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
-                        Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
-                    </p>
+                    <img src="/Friends-Dark.png" className="rounded-xl" alt="friends"/>
                 </section>
 
 
-            <section className="gap-4 grid grid-cols-1 sm:grid-cols-3 mx-4">
-                {features.map((feature) => (
-                    <Card key={feature.id} className="items-center p-4 shadow-lg bg-gray-200 dark:bg-slate-900" data-aos="flip-down" data-aos-duration="1000">
-                        <Image src="/lg-dark-logo.png" className="border-1 border-blue-500 rounded-lg" width={400} height={400} alt={feature.name + " demo image"} />
-                        <CardHeader className="font-semibold text-2xl">{feature.name}</CardHeader>
-                        <CardBody>{feature.info}</CardBody>
-                    </Card>
-                ))}
-            </section>
+            
 
 
-            <section className="flex text-center items-center justify-center m-14">
-                <div>
-                    <h1 data-aos="fade-right" data-aos-duration="1000" className="mb-4 text-3xl text-center text-black dark:text-white font-bold mt-10">Don&apos;t have an account?</h1>
-                    <Button color="primary" data-aos="fade-left" data-aos-duration="1000" onClick={() => router.push("/signup")}>Signup</Button>
-
-                
-                </div>
-            </section>
-
-
-            <section className="flex bg-gray-200 dark:bg-slate-900 justify-between border-solid border-slate-700 border-t-1">
-                {currentTheme === 'dark' ? (
-                    <Image width={100} height={100} src="/lg-dark-logo.png" alt="logo" />
-                ) : (
-                    <Image className="my-10" width={100} height={100} src="/lg-logo.png" alt="logo" />
-                )}
-                <Link onClick={() => router.push("/about")} className="cursor-pointer text-black dark:text-white mr-4">About Us</Link>
-            </section>
             </div>
         </div>
     );
