@@ -16,7 +16,7 @@ export default function NotificationCard({notification, initiator, meetup, onCli
     }
 
     return (
-        <Card className="mb-4 min-w-52 overflow-visible dark:bg-stone-950 py-0">
+        <Card className="mb-4 min-w-52 h-full overflow-visible dark:bg-stone-950 py-0">
             <CardHeader className="flex flex-row w-full m-0">
 
                     {notification ?
@@ -52,7 +52,7 @@ export default function NotificationCard({notification, initiator, meetup, onCli
                         }
                     </div>
                 </CardHeader>
-                    <CardBody className="pb-1 pt-0 flex w-full flex-row justify-between">
+                    <CardBody className="pb-1 pt-0 flex items-end mb-2 w-full flex-row justify-between">
                         {notification?
                             <Chip
                                 startContent={<CalendarIcon width={16} height={16}/>}

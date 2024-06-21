@@ -179,7 +179,7 @@ export default function Settings() {
 
     return (
         <div className="w-full h-[calc(100vh-80px)] flex flex-col">
-            <Tabs variant="solid" className="absolute top-5 right-5 " aria-label="Tabs variants">
+            <Tabs variant="solid" className="fixed z-50 top-5 right-5 " aria-label="Tabs variants">
                 <Tab key="Account" className="w-full" title="Account">
                     <div className="flex flex-col w-full">
                         <div className="flex flex-row p-4 border-b dark:border-stone-800 items-center">

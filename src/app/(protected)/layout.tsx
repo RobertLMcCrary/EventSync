@@ -65,15 +65,16 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
         <div className="relative flex flex-row w-screen h-full">
             <Sidebar active={active} sidebarRef={sidebarRef} user={user} expanded={sidebarExpanded} setExpanded={setSidebarExpanded}/>
 
-            <div className={(sidebarExpanded ? "blur-sm" : "") + " flex flex-col w-full  bg-stone-100 dark:bg-black"}>
-                <div className="flex flex-row items-center min-h-20 h-20 p-4 justify-between w-full bg-white dark:bg-black border-b dark:border-stone-800 border-stone-200">
+            <div className={(sidebarExpanded ? "blur-sm" : " md:w-[calc(100%-96px)] md:ml-24 xl:ml-64 xl:w-[calc(100%-256px)]") + "w-full flex flex-col  bg-stone-100 dark:bg-black"}>
+                <div className="flex fixed z-30 flex-row items-center min-h-20 h-20 p-4 justify-between w-full bg-white/50 dark:bg-black/50 backdrop-blur border-b dark:border-stone-800 border-stone-200">
                     <div className="flex flex-row items-center">
                     <Bars3BottomLeftIcon className="block md:hidden dark:hover:text-white/80 w-6 h-6 mr-4" onClick={() => setSidebarExpanded(!sidebarExpanded)}/>
                     <p className="text-blue-500 text-2xl font-bold">{navName}</p>
                     </div>
                 </div>
-
-                { children }
+                <div className="mt-20 h-[calc(100%-80px)]">
+                    { children }
+                </div>
             </div>
         </div>
         </>

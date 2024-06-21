@@ -61,7 +61,7 @@ export default function Meetups() {
       <Input
           placeholder="Search"
           value={meetupsSearch}
-          className="absolute top-5 right-8 w-64"
+          className="fixed z-50 top-5 dark:bg-neutral-900/50 right-8 w-64"
           onChange={(e) => setMeetupsSearch(e.target.value)}
           startContent={<MagnifyingGlassIcon width={20} height={20}/>}
       />

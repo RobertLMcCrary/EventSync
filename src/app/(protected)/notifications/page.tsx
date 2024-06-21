@@ -66,10 +66,12 @@ export default function NotificationsPage() {
     }, [knownMeetups, knownUsers, notifications, session.session.token, user]);
 
 
+
+
     return (
-        <div className="p-4 flex flex-wrap w-full gap-4 h-full overflow-scroll">
-            {notifications.map((notification, index) => (
-                <div key={index} className="h-min">
+        <div className="p-4 gap-4 w-full grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1">
+            {notifications.sort().toReversed().map((notification, index) => (
+                <div key={index} className="h-36">
                     <NotificationCard initiator={knownUsers.find((user) => user._id == notification?.initiator) || null} meetup={knownMeetups.find((meetup) => meetup._id == notification?.meetup) || null} onClick={notification?.buttonHREF ? () => router.push(notification.buttonHREF) : () => router.push('/dashboard')} notification={notification} key={index}/>
                 </div>
             ))}

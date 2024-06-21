@@ -37,46 +37,28 @@ export default function Friends() {
         });
     }
 
-    function fetchIncomingRequests() {
-        if (!user) return;
-        setIncomingRequests([]);
-        const incomingRequestsPromises = Promise.all(user.incomingFriendRequests.map(async (requestID) => {
-            const res = await fetch(`/api/user/${requestID}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.session.token}`
-                }
-            });
-            if (!res.ok) return null;
-            return await res.json();
-        }));
-
-        incomingRequestsPromises.then((incomingRequestsData) => {
-            let incomingRequestsDataFiltered = incomingRequestsData.filter((request) => request !== null);
-            setIncomingRequests(incomingRequestsDataFiltered.map((request) => request as User));
+    async function fetchIncomingRequests(requestID: string) {
+        const res = await fetch(`/api/user/${requestID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`
+            }
         });
+        if (!res.ok) return null;
+        return await res.json();
     }
 
-    function fetchOutgoingRequests() {
-        if (!user) return;
-        setOutgoingRequests([]);
-        const outgoingRequestsPromises = Promise.all(user.outgoingFriendRequests.map(async (requestID) => {
-            const res = await fetch(`/api/user/${requestID}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.session.token}`
-                }
-            });
-            if (!res.ok) return null;
-            return await res.json();
-        }));
-
-        outgoingRequestsPromises.then((outgoingRequestsData) => {
-            let outgoingRequestsDataFiltered = outgoingRequestsData.filter((request) => request !== null);
-            setOutgoingRequests(outgoingRequestsDataFiltered.map((request) => request as User));
+    async function fetchOutgoingRequests(requestID: string) {
+        const res = await fetch(`/api/user/${requestID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.session.token}`
+            }
         });
+        if (!res.ok) return null;
+        return await res.json();
     }
 
     useEffect(() => {
@@ -88,11 +70,23 @@ export default function Friends() {
         }
 
         if (incomingRequests.includes(null)){
-            fetchIncomingRequests();
+            setIncomingRequests([]);
+            const incomingRequestsPromises = Promise.all(user.incomingFriendRequests.map(fetchOutgoingRequests));
+
+            incomingRequestsPromises.then((incomingRequestsData) => {
+                let incomingRequestsDataFiltered = incomingRequestsData.filter((request) => request !== null);
+                setIncomingRequests(incomingRequestsDataFiltered.map((request) => request as User));
+            });
         }
 
         if (outgoingRequests.includes(null)) {
-            fetchOutgoingRequests();
+            setOutgoingRequests([]);
+            const outgoingRequestsPromises = Promise.all(user.outgoingFriendRequests.map(fetchOutgoingRequests));
+
+            outgoingRequestsPromises.then((outgoingRequestsData) => {
+                let outgoingRequestsDataFiltered = outgoingRequestsData.filter((request) => request !== null);
+                setOutgoingRequests(outgoingRequestsDataFiltered.map((request) => request as User));
+            });
         }
 
     }, [user, friends, session.session.token, incomingRequests, outgoingRequests]);
@@ -101,17 +95,44 @@ export default function Friends() {
         if (!user) return;
 
         if (!incomingRequests.includes(null)) {
-            if (incomingRequests.length !== user.incomingFriendRequests.length) {
-                fetchIncomingRequests();
+            for (let i = 0; i < user.incomingFriendRequests.length; i++) {
+                if (incomingRequests[i]?._id !== user.incomingFriendRequests[i]) {
+                    fetchIncomingRequests(user.incomingFriendRequests[i]).then((request) => {
+                        if (i >= outgoingRequests.length) {
+                            setIncomingRequests((incomingRequests) => [
+                                ...incomingRequests, request]);
+                        } else {
+                            setIncomingRequests((incomingRequests) => {
+                                const newIncomingRequests = [...incomingRequests];
+                                newIncomingRequests.splice(i, 1, request);
+                                return newIncomingRequests;
+                            });
+                        }
+                    });
+                }
             }
         }
 
         if (!outgoingRequests.includes(null)) {
-            if (outgoingRequests.length !== user.outgoingFriendRequests.length) {
-                fetchOutgoingRequests();
+            for (let i = 0; i < user.outgoingFriendRequests.length; i++) {
+                if (outgoingRequests[i]?._id !== user.outgoingFriendRequests[i]) {
+                    fetchOutgoingRequests(user.outgoingFriendRequests[i]).then((request) => {
+                        if (i >= outgoingRequests.length) {
+                            setOutgoingRequests((outgoingRequests) => [
+                                ...outgoingRequests, request]);
+                        } else {
+                            setOutgoingRequests((outgoingRequests) => {
+                                const newOutgoingRequests = [...outgoingRequests];
+                                newOutgoingRequests.splice(i, 1, request);
+                                return newOutgoingRequests;
+                            });
+                        }
+                    });
+                }
             }
         }
     }, [user]);
+
     async function acceptFriendRequest(friend: User | null) {
         if (!user) return;
         if (!friend) return
