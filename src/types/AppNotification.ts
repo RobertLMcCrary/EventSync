@@ -65,5 +65,25 @@ class AppNotification {
     }
 }
 
+const defaultNotification = new AppNotification(
+    {
+        date: new Date(),
+        initiator: "",
+        receiver: "",
+        meetup: "",
+        type: 1
+    }
+);
 
-export { AppNotification };
+const defaultNotification2 = new AppNotification(
+    {
+        date: new Date(),
+        initiator: "",
+        receiver: "",
+        meetup: "",
+        type: 13
+    }
+);
+
+
+export { AppNotification, defaultNotification, defaultNotification2 };

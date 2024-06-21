@@ -23,6 +23,10 @@ import {
     NavbarMenu,
     NavbarMenuItem
 } from "@nextui-org/react"
+import NotificationCard from "@/app/components/notification";
+import {defaultMeetup, defaultUser, defaultNotification, defaultNotification2} from "@/types";
+import MeetupCard from "@/app/components/meetupCard";
+import {UserCard} from "@/app/components/UserCard";
 
 
 
@@ -78,8 +82,8 @@ export default function Home() {
     }, [])
 
     return (
-        <div className="bg-white w-screen ">
-            <div className="bg-gradient-to-b from-blue-500/30 via-green-500/30 to-red-500/30">
+        <div className="h-full w-screen ">
+            <div className="">
             <Navbar maxWidth="full" className="h-20 bg-white/50 backdrop-blur dark:bg-black/50 drop-shadow-lg">
                 <NavbarContent>
                     <NavbarContent justify="start">
@@ -121,7 +125,13 @@ export default function Home() {
                             <Link onClick={() => router.push("/about")} className="cursor-pointer text-black dark:text-white">About Us</Link>
                         </NavbarItem>
                         <NavbarItem>
-                            <Button onClick={() => router.push("/login")} color="primary">Login</Button>
+                            <div className="relative">
+                                <div className="rounded-xl absolute p-2 z-40 bg-gray-950 backdrop-blur w-24 h-10">
+                                    hi
+                                </div>
+                                <div className="absolute top-0 left-0 w-24 h-10 bg-gradient-to-r from-purple-500 to-blue-500 blur">
+                                </div>
+                            </div>
                         </NavbarItem>
                     </NavbarContent>
                 </NavbarContent>
@@ -130,7 +140,8 @@ export default function Home() {
                         <Link onClick={() => router.push("/about")} className="cursor-pointer text-black dark:text-white">About Us</Link>
                     </NavbarMenuItem>
                     <NavbarMenuItem>
-                        <Button onClick={() => router.push("/login")} color="primary">Login</Button>
+                        <div className="rounded-xl p-2 bg-gray-950/50 backdrop-blur w-52 h-14">
+                        </div>
                     </NavbarMenuItem>
                     <NavbarMenuItem>
                         <Button onClick={() => router.push("/signup")} color="primary">Signup</Button>
@@ -139,24 +150,39 @@ export default function Home() {
             </Navbar>
 
 
-            <section className="flex justify-center items-center h-[calc(100vh-80px)] dark:from-slate-900 dark:to-black">
-                <div className="flex flex-col text-center">
-                    <h1 data-aos="fade-right" data-aos-duration="700" className="md:text-9xl text-8xl bg-clip-text h-40 text-transparent bg-gradient-to-r from-green-500/60 to-blue-500 font-bold md:mb-4">EventSync</h1>
-                    <h2 data-aos="fade-left" data-aos-duration="700" className="md:text-2xl text-lg font-bold text-black/30 dark:text-white">Bringing <span className="bg-gradient-to-r bg-clip-text from-blue-500 to-green-500 text-transparent">friends</span> together has never been easier</h2>
+            <section className="flex justify-center relative items-center h-[calc(100vh-80px)] dark:bg-black">
+                <div className="absolute top-16 left-16 rounded-xl rotate-12 w-52 h-min">
+                    <NotificationCard notification={defaultNotification} className="dark:bg-neutral-900 rounded-xl shadow-xl" initiator={defaultUser} meetup={defaultMeetup} onClick={() => {return}}/>
+                </div>
+                <div className="absolute bottom-16 right-16 rounded-xl -rotate-12 w-52 h-min">
+                    <MeetupCard small creator={defaultUser} meetup={defaultMeetup}/>
+                </div>
+                <div className="absolute bottom-16 left-16 rounded-xl -rotate-6 w-64 h-min">
+                    <UserCard user={defaultUser}/>
+                </div>
+                <div className="absolute top-8 right-8 rounded-xl rotate-3 w-72 h-min">
+                    <NotificationCard notification={defaultNotification2} className="dark:bg-neutral-900 rounded-xl " initiator={defaultUser} meetup={defaultMeetup} onClick={() => {return}}/>
+                </div>
+                <div className="flex flex-col text-center items-center">
+                    <h1 data-aos="fade-right" data-aos-duration="700" className="text-5xl w-2/3 bg-clip-text h-32 text-transparent bg-gradient-to-b text-wrap from-white to-gray-500 font-semibold ">Never miss a moment with EventSync</h1>
+                    <h2 data-aos="fade-left" data-aos-duration="700" className="text-lg text-black/30 dark:text-gray-400">Bringing <span className="font-bold">people</span> together has never been easier</h2>
                 </div>
             </section>
 
 
 
             <section className="items-center p-4 mb-[25vh] mx-[5vw]">
-                <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Hang Out</h1>
-                <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
+                <h1 data-aos="fade-right" data-aos-duration="1000" className="text-7xl text-transparent bg-clip-text bg-gradient-to-b h-32 from-white to-gray-500 font-bold">Plan Easily</h1>
+
+                <p data-aos-duration="1000" className="text-xl font-semibold mb-4 dark:text-gray-300 text-black/50">
                     Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
                 </p>
+                <img src="/Meetup-Dark.png" alt="meetup"/>
             </section>
 
                 <section className="items-center p-4 mb-[25vh] mx-[5vw]">
                     <h1 data-aos="fade-right" data-aos-duration="1000" className="text-9xl font-bold">Connect</h1>
+
                     <p data-aos-duration="1000" className="text-xl font-bold mt-8 text-black/50">
                         Create memorable hangouts with friends effortlessly. Event Sync simplifies scheduling, location sharing, and attendee management for seamless gatherings
                     </p>

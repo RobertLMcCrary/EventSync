@@ -91,6 +91,9 @@ const defaultUser = new User({
     username: "John Doe",
     email: "johndoe@eventsync.app",
     password: "password",
+    avatar: "https://avatars.githubusercontent.com/u/76001641?v=4",
+    bio: "Passionate about hiking and technology.",
+    interests: ["Hiking", "Technology", "AI"],
 });
 
 export {User, defaultUser};
