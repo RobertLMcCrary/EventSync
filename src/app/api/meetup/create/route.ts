@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
 
                 if (index !== -1) {
                     meetup.invited[index] = user._id
-                    console.log(meetup.invited);
                 }
                 await notifyUser(meetup, user)
             }

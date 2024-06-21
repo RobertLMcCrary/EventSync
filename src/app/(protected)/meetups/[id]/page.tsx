@@ -166,7 +166,6 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
 
     async function createAnnouncement(e){
         e.preventDefault();
-        console.log(announcementInput);
         if (announcementInput == ""){
             return;
         }

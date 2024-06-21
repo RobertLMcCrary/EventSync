@@ -7,9 +7,9 @@ import {User} from "@/types";
 import {UserCard} from "@/app/components/UserCard";
 
 
-export default function AddFriendModal({isOpen, onOpenChange}: Readonly<{isOpen: boolean, onOpenChange: (open: boolean) => void}>){
+export default function AddFriendModal({isOpen, onOpenChange, setOutgoingFriendRequests}: Readonly<{isOpen: boolean, onOpenChange: (open: boolean) => void, setOutgoingFriendRequests: any}>){
     const [email, setEmail] = useState<string>("");
-    const {user, updateUser} = useUser();
+    const {user, setUser} = useUser();
     const session = useContext(sessionContext);
     const [error, setError] = useState<string>("");
     const [friend, setFriend] = useState<User | null>(null);
@@ -133,7 +133,10 @@ export default function AddFriendModal({isOpen, onOpenChange}: Readonly<{isOpen:
             return;
         }
 
-        await updateUser();
+        setUser({...user, outgoingFriendRequests: [...user.outgoingFriendRequests, friend._id]});
+        setOutgoingFriendRequests((outgoing: User[]) => (
+            [...outgoing, friend]
+        ));
         onOpenChange(false);
     }
 

@@ -9,82 +9,109 @@ import {useEffect, useState, useContext} from "react";
 import {User} from "@/types";
 
 
-
 export default function Friends() {
-    const { user, updateUser } = useUser();
+    const { user, setUser } = useUser();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const session = useContext(sessionContext);
     const [friends, setFriends] = useState<(User | null)[]>([null, null, null, null, null, null, null]);
     const [incomingRequests, setIncomingRequests] = useState<(User | null)[]>([null, null, null, null]);
     const [outgoingRequests, setOutgoingRequests] = useState<(User | null)[]>([null, null, null, null]);
 
+    function fetchFriends(){
+        if (!user) return;
+        const friendPromises = Promise.all(user.friends.map(async (friendID) => {
+            const res = await fetch(`/api/user/${friendID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.token}`
+                }
+            });
+            if (!res.ok) return null;
+            return await res.json();
+        }));
+
+        friendPromises.then((friendsData) => {
+            let friendsDataFiltered = friendsData.filter((friend) => friend !== null);
+            setFriends(friendsDataFiltered.map((friend) => friend as User));
+        });
+    }
+
+    function fetchIncomingRequests() {
+        if (!user) return;
+        setIncomingRequests([]);
+        const incomingRequestsPromises = Promise.all(user.incomingFriendRequests.map(async (requestID) => {
+            const res = await fetch(`/api/user/${requestID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.token}`
+                }
+            });
+            if (!res.ok) return null;
+            return await res.json();
+        }));
+
+        incomingRequestsPromises.then((incomingRequestsData) => {
+            let incomingRequestsDataFiltered = incomingRequestsData.filter((request) => request !== null);
+            setIncomingRequests(incomingRequestsDataFiltered.map((request) => request as User));
+        });
+    }
+
+    function fetchOutgoingRequests() {
+        if (!user) return;
+        setOutgoingRequests([]);
+        const outgoingRequestsPromises = Promise.all(user.outgoingFriendRequests.map(async (requestID) => {
+            const res = await fetch(`/api/user/${requestID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.session.token}`
+                }
+            });
+            if (!res.ok) return null;
+            return await res.json();
+        }));
+
+        outgoingRequestsPromises.then((outgoingRequestsData) => {
+            let outgoingRequestsDataFiltered = outgoingRequestsData.filter((request) => request !== null);
+            setOutgoingRequests(outgoingRequestsDataFiltered.map((request) => request as User));
+        });
+    }
 
     useEffect(() => {
         if (!user) return;
 
         if (friends.includes(null)) {
             setFriends([]);
-            const friendPromises = Promise.all(user.friends.map(async (friendID) => {
-                const res = await fetch(`/api/user/${friendID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.session.token}`
-                    }
-                });
-                if (!res.ok) return null;
-                return await res.json();
-            }));
-
-            friendPromises.then((friendsData) => {
-                let friendsDataFiltered = friendsData.filter((friend) => friend !== null);
-                setFriends(friendsDataFiltered.map((friend) => friend as User));
-            });
+            fetchFriends();
         }
 
         if (incomingRequests.includes(null)){
-            setIncomingRequests([]);
-            const incomingRequestsPromises = Promise.all(user.incomingFriendRequests.map(async (requestID) => {
-                const res = await fetch(`/api/user/${requestID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.session.token}`
-                    }
-                });
-                if (!res.ok) return null;
-                return await res.json();
-            }));
-
-            incomingRequestsPromises.then((incomingRequestsData) => {
-                let incomingRequestsDataFiltered = incomingRequestsData.filter((request) => request !== null);
-                setIncomingRequests(incomingRequestsDataFiltered.map((request) => request as User));
-            });
+            fetchIncomingRequests();
         }
 
         if (outgoingRequests.includes(null)) {
-            setOutgoingRequests([]);
-            const outgoingRequestsPromises = Promise.all(user.outgoingFriendRequests.map(async (requestID) => {
-                const res = await fetch(`/api/user/${requestID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.session.token}`
-                    }
-                });
-                if (!res.ok) return null;
-                return await res.json();
-            }));
-
-            outgoingRequestsPromises.then((outgoingRequestsData) => {
-                let outgoingRequestsDataFiltered = outgoingRequestsData.filter((request) => request !== null);
-                setOutgoingRequests(outgoingRequestsDataFiltered.map((request) => request as User));
-            });
+            fetchOutgoingRequests();
         }
 
     }, [user, friends, session.session.token, incomingRequests, outgoingRequests]);
 
+    useEffect(() => {
+        if (!user) return;
 
+        if (!incomingRequests.includes(null)) {
+            if (incomingRequests.length !== user.incomingFriendRequests.length) {
+                fetchIncomingRequests();
+            }
+        }
+
+        if (!outgoingRequests.includes(null)) {
+            if (outgoingRequests.length !== user.outgoingFriendRequests.length) {
+                fetchOutgoingRequests();
+            }
+        }
+    }, [user]);
     async function acceptFriendRequest(friend: User | null) {
         if (!user) return;
         if (!friend) return
@@ -138,7 +165,16 @@ export default function Friends() {
             })
         });
 
-        await updateUser();
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                friends: [...user.friends, friend._id],
+                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
+        setFriends((friends) => [...friends, friend]);
+        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
     }
 
     async function declineFriendRequest(friend: User | null) {
@@ -188,8 +224,14 @@ export default function Friends() {
             })
         });
 
-        await updateUser();
-
+        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
         return;
     }
 
@@ -242,16 +284,21 @@ export default function Friends() {
             })
         });
 
-        await updateUser();
-
         setOutgoingRequests((outgoingRequests) => outgoingRequests.filter((request) => request !== friend));
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                outgoingFriendRequests: user.outgoingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
 
         return;
     }
 
     return (
       <>
-          <AddFriendModal isOpen={isOpen} onOpenChange={onOpenChange}/>
+          <AddFriendModal setOutgoingFriendRequests={setOutgoingRequests} isOpen={isOpen} onOpenChange={onOpenChange}/>
         <Button onPress={onOpen} color="primary" variant="flat" className="absolute top-4 right-4" isIconOnly>
             <PlusIcon  className="h-6 w-6"/>
         </Button>
