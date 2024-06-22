@@ -6,10 +6,11 @@ import {MagnifyingGlassIcon, PlusIcon} from "@heroicons/react/24/solid";
 import NotificationCard from "@/app/components/notification";
 import useDashboardState from "@/app/(protected)/dashboard/useDashboardState";
 import fetchData from './fetchData';
+import {EventCard} from "@/app/components/EventCard";
 
 
 export default function Dashboard() {
-    const { user, meetups, setMeetups, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired, setGlobalError} = useDashboardState();
+    const { user, meetups, setMeetups, knownUsers, setKnownUsers, notifications, setNotifications, router, session, status, knownMeetups, setKnownMeetups, updateUser, expired, setExpired, setGlobalError, events, setEvents} = useDashboardState();
     const [visibleMeetups, setVisibleMeetups] = useState(meetups);
     const [meetupsSearch, setMeetupsSearch] = useState("");
 
@@ -29,9 +30,11 @@ export default function Dashboard() {
             setKnownMeetups,
             setExpired,
             setGlobalError,
-            setVisibleMeetups
+            setVisibleMeetups,
+            setEvents
         });
     }, [meetups, notifications, session, knownUsers, router, status, user, setKnownUsers, setNotifications, setMeetups, knownMeetups, setKnownMeetups, setExpired, setGlobalError]);
+
 
     function viewNotification(notificationID: string){
         if (!user) return;
@@ -137,12 +140,25 @@ export default function Dashboard() {
                             ))}
                         </div>
                     </div>
-                    <div className="relative dark:bg-neutral-900 w-full mt-4 ml-4 md:h-1/2 h-full overflow-auto rounded-xl  bg-white flex flex-col">
-                        <div className="flex flex-row p-4 justify-between">
-                            <h1 className="text-xl font-semibold">Friends</h1>
+                        <div className="relative dark:bg-neutral-900 mt-4 w-full ml-4 h-full md:h-1/2 max-h-screen overflow-auto rounded-xl  bg-white flex flex-col">
+                            <div className="flex flex-row p-4 justify-between">
+                                <h1 className="lg:text-xl md:text-lg text-base font-semibold">Upcoming Events</h1>
+
+                            </div>
+                            <div className="p-4 pt-0 h-14">
+                                <Input
+                                    placeholder="Search"
+                                    className="w-full "
+                                    startContent={<MagnifyingGlassIcon width={20} height={20}/>}
+                                />
+                            </div>
+                            <div className="flex flex-col w-full p-4 gap-4 overflow-y-scroll">
+                                { events.map((event, index) => (
+                                    <EventCard event={event} key={index}/>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
         </div>
 
     );

@@ -17,9 +17,10 @@ interface fetchParams {
     setExpired: any;
     setGlobalError: any;
     setVisibleMeetups: any;
+    setEvents: any;
 }
 
-export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired, setGlobalError, setVisibleMeetups} : fetchParams){
+export default function fetchData({session, setKnownUsers, user, setNotifications, knownUsers, setMeetups, meetups, notifications, router, status, knownMeetups, setKnownMeetups, setExpired, setGlobalError, setVisibleMeetups, setEvents} : fetchParams){
     if (!user) return;
     if (!knownUsers.includes(user)) setKnownUsers((prev: any) => [...prev, user]);
 
@@ -43,6 +44,7 @@ export default function fetchData({session, setKnownUsers, user, setNotification
 
                 eventRes.then((res) => {
                     res.json().then((events) => {
+                        setEvents(events);
                         console.log(events);
                     });
                 });

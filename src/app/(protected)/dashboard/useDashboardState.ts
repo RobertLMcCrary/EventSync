@@ -2,6 +2,7 @@ import {useContext, useState} from "react";
 import {sessionContext, useUser, expiredContext, globalErrorContext} from "@/app/providers";
 import {AppNotification, Meetup, User} from "@/types";
 import {useRouter} from "next13-progressbar";
+import {PublicEvent} from "@/types/Event";
 
 export default function useDashboardState() {
     const {user, updateUser} = useUser();
@@ -14,6 +15,7 @@ export default function useDashboardState() {
     // Get TOKEN from cookie
     const { session, status } = useContext(sessionContext);
     const {expired, setExpired} = useContext(expiredContext);
+    const [events, setEvents] = useState<PublicEvent[]>([]);
 
     return {
         user,
@@ -31,7 +33,9 @@ export default function useDashboardState() {
         updateUser,
         expired,
         setExpired,
-        setGlobalError
+        setGlobalError,
+        events,
+        setEvents
     };
 
 }
