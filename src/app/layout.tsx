@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " no-scrollbar text-black dark:text-white"}>
+      <body className={inter.className + " no-scrollbar h-full w-full bg-gray-100 dark:bg-black text-black dark:text-white"}>
       <Providers>
         {children}
           <SessionExpiredModal/>

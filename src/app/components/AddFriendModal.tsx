@@ -145,7 +145,7 @@ export default function AddFriendModal({isOpen, onOpenChange, setOutgoingFriendR
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
             <ModalContent className="p-4 flex flex-col gap-2">
                 <h1 className="text-lg font-bold">Add Friend</h1>
-                <Input type="email" value={email} onValueChange={setEmail} placeholder="Enter Email" endContent={<Button className="bg-transparent" isIconOnly><CheckIcon onClick={addFriend} className="h-5 w-5 text-green-500 hover:text-green-400"/></Button>}/>
+                <Input type="email" value={email} onValueChange={setEmail} placeholder="Enter Email" endContent={<Button className="bg-transparent" isLoading={loading} isIconOnly><CheckIcon onClick={addFriend} className="h-5 w-5 text-green-500 hover:text-green-400"/></Button>}/>
 
 
                 {friend && <>

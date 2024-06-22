@@ -81,13 +81,22 @@ async function notifyUser(meetup: Meetup, attendee: User | null) {
         type: 1
     });
 
-    await fetch(process.env.NEXT_PUBLIC_MAIL_URL + '/send-meetup-invite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email: attendee.email, inviteLink: `https://beta.eventsync.app/meetups/invite/${token}`, meetupName: meetup.title}),
-    });
 
     await createNotification(notification);
+
+    try {
+        await fetch(process.env.NEXT_PUBLIC_MAIL_URL + '/send-meetup-invite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: attendee.email,
+                inviteLink: `https://beta.eventsync.app/meetups/invite/${token}`,
+                meetupName: meetup.title
+            }),
+        });
+    } catch {
+        return;
+    }
 }

@@ -1,4 +1,5 @@
 import {Meetup, User, AppNotification, ReadNotification} from '@/types';
+import {getUpcomingEvents} from "@/app/api/utils/eventFinder";
 
 interface fetchParams {
     session: any;
@@ -25,6 +26,28 @@ export default function fetchData({session, setKnownUsers, user, setNotification
     if (status != 'done') return;
 
     if (user.meetups && meetups.includes(null)) {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const eventRes = fetch('/api/events/find', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.token}`
+                    },
+                    body: JSON.stringify({
+                        lat: position.coords.latitude.toString(),
+                        lon: position.coords.longitude.toString(),
+                        interests: user.interests
+                    })
+                });
+
+                eventRes.then((res) => {
+                    res.json().then((events) => {
+                        console.log(events);
+                    });
+                });
+            });
+        }
 
         const fetchPromises = user.meetups.map(async (meetupID: string) => {
 

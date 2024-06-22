@@ -26,13 +26,14 @@ interface ResponseData {
     events: Event[];
 }
 
-async function getUpcomingEventsHandler(location: Location, interests: string[]): Promise<Event[]> {
+async function getUpcomingEventsHandler(lat: string, lon: string, interests: string[]): Promise<Event[]> {
     const endpoint = "https://api.seatgeek.com/2/events";
     const clientId = process.env.SEATGEEK_CLIENT_ID || "";
+    console.log(clientId)
     const queryParams = new URLSearchParams({
         client_id: clientId,
-        lat: location.latitude.toString(),
-        lon: location.longitude.toString(),
+        lat: lat,
+        lon: lon,
         per_page: '10'
     });
     if (interests && interests.length > 0) {
@@ -64,9 +65,9 @@ async function getUpcomingEventsHandler(location: Location, interests: string[])
     }
 }
 
-export async function getUpcomingEvents(location: Location, interests: string[]): Promise<Event[] | Error> {
+export async function getUpcomingEvents(lat: string, lon: string, interests: string[]): Promise<Event[] | Error> {
     try {
-        return await getUpcomingEventsHandler(location, interests);
+        return await getUpcomingEventsHandler(lat, lon, interests);
     } catch (error) {
         return new Error("An error occurred while fetching upcoming events.");
     }

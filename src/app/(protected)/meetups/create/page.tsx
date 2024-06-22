@@ -58,7 +58,6 @@ export default function CreateMeetup() {
                 })
                 .catch(error => console.error('Error:', error));
         }
-        console.log(image, attendees);
         fetch('/api/meetup/create', {
             method: 'POST',
             headers: {

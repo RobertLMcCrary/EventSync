@@ -1,6 +1,6 @@
 // TODO: Completed Friends Page
 "use client";
-import { useUser, sessionContext } from "@/app/providers";
+import {useUser, sessionContext, globalErrorContext} from "@/app/providers";
 import {Button, Input, Tab, Tabs, useDisclosure} from "@nextui-org/react";
 import {CheckIcon, MagnifyingGlassIcon, PlusIcon, XMarkIcon} from "@heroicons/react/24/solid";
 import {UserCard} from "@/app/components/UserCard";
@@ -16,6 +16,8 @@ export default function Friends() {
     const [friends, setFriends] = useState<(User | null)[]>([null, null, null, null, null, null, null]);
     const [incomingRequests, setIncomingRequests] = useState<(User | null)[]>([null, null, null, null]);
     const [outgoingRequests, setOutgoingRequests] = useState<(User | null)[]>([null, null, null, null]);
+    const {globalError, setGlobalError} = useContext(globalErrorContext);
+
 
     function fetchFriends(){
         if (!user) return;
@@ -137,6 +139,18 @@ export default function Friends() {
         if (!user) return;
         if (!friend) return
 
+
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                friends: [...user.friends, friend._id],
+                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
+        setFriends((friends) => [...friends, friend]);
+        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
+
         const res = await fetch(`/api/user/${user._id}`, {
             method: 'PUT',
             headers: {
@@ -186,21 +200,34 @@ export default function Friends() {
             })
         });
 
-        setUser((user: User) => {
-            if (!user) return user;
-            return {
-                ...user,
-                friends: [...user.friends, friend._id],
-                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
-            }
-        });
-        setFriends((friends) => [...friends, friend]);
-        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
+        if (!res.ok || !res2.ok){
+            setUser((user: User) => {
+                if (!user) return user;
+                return {
+                    ...user,
+                    friends: user.friends.filter((friendID) => friendID !== friend._id),
+                    incomingFriendRequests: [...user.incomingFriendRequests, friend._id]
+                }
+            });
+            setFriends((friends) => friends.filter((friend) => friend !== friend));
+            setIncomingRequests((incomingRequests) => [...incomingRequests, friend]);
+            if (!res.ok) setGlobalError(await res.json());
+            if (!res2.ok) setGlobalError(await res2.json());
+        }
     }
 
     async function declineFriendRequest(friend: User | null) {
         if (!user) return;
         if (!friend) return;
+
+        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
 
         const res = await fetch(`/api/user/${user._id}`, {
             method: 'PUT',
@@ -245,21 +272,35 @@ export default function Friends() {
             })
         });
 
-        setIncomingRequests((incomingRequests) => incomingRequests.filter((request) => request !== friend));
-        setUser((user: User) => {
-            if (!user) return user;
-            return {
-                ...user,
-                incomingFriendRequests: user.incomingFriendRequests.filter((request) => request !== friend._id)
-            }
-        });
+        if (!res.ok || !res2.ok){
+            setIncomingRequests((incomingRequests) => [...incomingRequests, friend]);
+            setUser((user: User) => {
+                if (!user) return user;
+                return {
+                    ...user,
+                    incomingFriendRequests: [...user.incomingFriendRequests, friend._id]
+                }
+            });
+            if (!res.ok) setGlobalError(await res.json());
+            if (!res2.ok) setGlobalError(await res2.json());
+        }
         return;
     }
 
 
     async function cancelFriendRequest(friend: User | null) {
+
         if (!user) return;
         if (!friend) return;
+
+        setOutgoingRequests((outgoingRequests) => outgoingRequests.filter((request) => request !== friend));
+        setUser((user: User) => {
+            if (!user) return user;
+            return {
+                ...user,
+                outgoingFriendRequests: user.outgoingFriendRequests.filter((request) => request !== friend._id)
+            }
+        });
 
         const res = await fetch(`/api/user/${user._id}`, {
             method: 'PUT',
@@ -305,14 +346,18 @@ export default function Friends() {
             })
         });
 
-        setOutgoingRequests((outgoingRequests) => outgoingRequests.filter((request) => request !== friend));
-        setUser((user: User) => {
-            if (!user) return user;
-            return {
-                ...user,
-                outgoingFriendRequests: user.outgoingFriendRequests.filter((request) => request !== friend._id)
-            }
-        });
+        if (!res.ok || !res2.ok){
+            setOutgoingRequests((outgoingRequests) => [...outgoingRequests, friend]);
+            setUser((user: User) => {
+                if (!user) return user;
+                return {
+                    ...user,
+                    outgoingFriendRequests: [...user.outgoingFriendRequests, friend._id]
+                }
+            });
+            if (!res.ok) setGlobalError(await res.json());
+            if (!res2.ok) setGlobalError(await res2.json());
+        }
 
         return;
     }
@@ -325,14 +370,14 @@ export default function Friends() {
         </Button>
 
           <Input startContent={ <MagnifyingGlassIcon className="text-gray-400 h-6 w-6"/>} className="absolute top-4 right-16 z-40 w-64" placeholder="Search"/>
-        <div className="flex w-full h-full flex-row">
+        <div className="flex w-full h-full grow flex-row">
             <div className={"flex w-2/3 " + (friends.length === 0 ? "items-center justify-center" : "flex-wrap") + " p-4 gap-4 overflow-y-scroll h-full"}>
                 {friends.length === 0 ? <p className="text-gray-500 text-lg">No friends yet</p> : null}
                 {friends.map((friend, index) => (
                     <UserCard user={friend} key={index}/>
                 ))}
             </div>
-            <div className="w-1/3">
+            <div className="w-1/3 h-full">
                 <div className="p-4 bg-white w-full dark:bg-stone-900 overflow-y-scroll max-h-full h-full shadow-md">
                     <h1 className="text-xl font-semibold mb-4 ">Friend Requests</h1>
                     <Tabs className="w-full">

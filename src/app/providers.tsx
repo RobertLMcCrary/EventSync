@@ -122,7 +122,7 @@ export function Providers({children}: { children: React.ReactNode }) {
 
         const intervalId = setInterval(async () => {
             await updateUser();
-        }, 1000 * 10);
+        }, 1000 * 60 * 5);
 
         return () => clearInterval(intervalId);
 
