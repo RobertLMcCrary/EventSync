@@ -65,9 +65,9 @@ export default function Meetups() {
           onChange={(e) => setMeetupsSearch(e.target.value)}
           startContent={<MagnifyingGlassIcon width={20} height={20}/>}
       />
-      <div className="flex flex-wrap p-4 gap-4 overflow-y-scroll h-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 gap-4 overflow-y-scroll h-screen auto-rows-min">
         {visibleMeetups.toReversed().map((meetup, i) => (
-            <div className="w-64" key={i}>
+            <div className="" key={i}>
               <MeetupCard meetup={meetup} creator={user} small={true} key={i} />
             </div>
         ))}

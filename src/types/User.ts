@@ -8,6 +8,11 @@ interface ReadNotification {
     read: boolean;
 }
 
+interface Pos {
+    lat: string;
+    lon: string;
+}
+
 interface UserParams {
     username: string;
     email: string;
@@ -25,6 +30,7 @@ interface UserParams {
     incomingFriendRequests?: string[];
     bio?: string;
     location?: string;
+    pos?: Pos;
 }
 
 class User {
@@ -44,8 +50,9 @@ class User {
     incomingFriendRequests: string[];
     bio: string; // User's bio
     location: string; // User's location
+    pos: Pos | null;
 
-    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests, bio, location, outgoingFriendRequests, incomingFriendRequests}: UserParams) {
+    constructor({username, email, password, meetups, _id, avatar, notifications, theme, verified, friends, googleAccount, interests, bio, location, outgoingFriendRequests, incomingFriendRequests, pos}: UserParams) {
         this._id = _id ? _id : generateSnowflake();
         this.username = username;
         this.email = email;
@@ -62,6 +69,7 @@ class User {
         this.incomingFriendRequests = incomingFriendRequests ? incomingFriendRequests : [];
         this.bio = bio ? bio : "";
         this.location = location ? location : "";
+        this.pos = pos ? pos : null;
     }
 
     // Converts a User instance to a JSON object
@@ -83,6 +91,7 @@ class User {
             incomingFriendRequests: this.incomingFriendRequests,
             bio: this.bio,
             location: this.location,
+            pos: this.pos,
         };
     }
 }

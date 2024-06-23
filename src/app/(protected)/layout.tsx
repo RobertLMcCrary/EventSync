@@ -71,7 +71,7 @@ export default function ProtectedLayout({children}: Readonly<{children: React.Re
                     <p className="text-blue-500 text-2xl font-bold">{navName}</p>
                     </div>
                 </div>
-                <div className="mt-20 h-[calc(100vh-80px)]">
+                <div className="mt-20 h-full">
                     { children }
                 </div>
             </div>

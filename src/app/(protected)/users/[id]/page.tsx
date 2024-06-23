@@ -9,6 +9,8 @@ import ClockIcon from "@heroicons/react/24/solid/ClockIcon";
 import MeetupCard from "@/app/components/meetupCard";
 
 export default function UserProfile({ params }: { params: { id: string } }) {
+
+
   return (
     <div className="w-full h-[calc(100vh-80px)] flex flex-col">
       <div className="w-full">

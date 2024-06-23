@@ -370,8 +370,8 @@ export default function Friends() {
         </Button>
 
           <Input startContent={ <MagnifyingGlassIcon className="text-gray-400 h-6 w-6"/>} className="absolute top-4 right-16 z-40 w-64" placeholder="Search"/>
-        <div className="flex w-full h-full grow flex-row">
-            <div className={"flex w-2/3 " + (friends.length === 0 ? "items-center justify-center" : "flex-wrap") + " p-4 gap-4 overflow-y-scroll h-full"}>
+        <div className="flex w-full overflow-y-scroll h-[calc(100vh-80px)] flex-row">
+            <div className={"w-2/3 " + (friends.length === 0 ? "items-center justify-center" : "grid auto-rows-max grid-cols-1 md:grid-cols-2  xl:grid-cols-3") + " p-4 gap-4 overflow-y-scroll h-full"}>
                 {friends.length === 0 ? <p className="text-gray-500 text-lg">No friends yet</p> : null}
                 {friends.map((friend, index) => (
                     <UserCard user={friend} key={index}/>

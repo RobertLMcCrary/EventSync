@@ -5,9 +5,10 @@ import {
     ClockIcon,
     MagnifyingGlassIcon,
     MapPinIcon,
-    PaperAirplaneIcon,
+    PaperAirplaneIcon, PencilIcon,
     PlusIcon,
     XMarkIcon,
+    PencilSquareIcon
 } from "@heroicons/react/24/outline";
 import {useRouter} from "next13-progressbar";
 import {Announcement, Meetup, User} from "@/types";
@@ -229,9 +230,11 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                             <div className="md:flex items-center justify-between flex-row mb-1">
                             <div className="flex flex-row">
                                 {meetup ?
-                                    <h1 className="text-2xl font-semibold mr-4 ">
+                                    <>
+                                    <h1 className="text-2xl font-semibold mr-2">
                                         {meetup.title}
                                     </h1>
+                                    <PencilSquareIcon onClick={() => router.push('/meetups/'+meetup._id+'/edit')} className="block w-6 mt-0.5 mr-4 h-6 text-gray-500 hover:text-gray-400 transition-all"/></>
                                     : <Skeleton className="w-[3/5] h-5 rounded-md"/>
                                 }
 
@@ -276,7 +279,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                             />
                                         ))}
                                     </AvatarGroup>
-                                    <span className="ml-4 mt-2 ">
+                                    <span className=" mt-2 ">
                                         {attendeeData == null ? <Skeleton/> : attendeeData.attendeesShow}
                                         <span className={(attendeeData == null ? "hidden" : "inline-block") + " ml-1 font-semibold"}>coming</span>
                       </span>

@@ -27,26 +27,55 @@ export default function fetchData({session, setKnownUsers, user, setNotification
     if (status != 'done') return;
 
     if (user.meetups && meetups.includes(null)) {
-        if ("geolocation" in navigator) {
+        let lat = null;
+        let lon = null;
+
+        if (user.pos){
+            lat = user.pos.lat;
+            lon = user.pos.lon;
+        } else if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition((position) => {
-                const eventRes = fetch('/api/events/find', {
-                    method: 'POST',
+                lat = position.coords.latitude.toString();
+                lon = position.coords.longitude.toString();
+
+                fetch('/api/user/'+user._id, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.token}`
+                        'Authorization': 'Bearer ' + session.token,
                     },
                     body: JSON.stringify({
-                        lat: position.coords.latitude.toString(),
-                        lon: position.coords.longitude.toString(),
-                        interests: user.interests
+                        update: {
+                            $set: {
+                                pos: {
+                                    lat: lat,
+                                    lon: lon
+                                }
+                            }
+                        }
                     })
                 });
+            });
+        }
+        console.log(lat, lon);
+        if (lat !== null && lon !== null) {
+            const eventRes = fetch('/api/events/find', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.token}`
+                },
+                body: JSON.stringify({
+                    lat: lat,
+                    lon: lon,
+                    interests: user.interests
+                })
+            });
 
-                eventRes.then((res) => {
-                    res.json().then((events) => {
-                        setEvents(events);
-                        console.log(events);
-                    });
+            eventRes.then((res) => {
+                res.json().then((events) => {
+                    setEvents(events);
+                    console.log(events);
                 });
             });
         }
