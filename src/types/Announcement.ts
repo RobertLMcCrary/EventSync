@@ -1,6 +1,6 @@
 import {generateSnowflake} from "../db/utils/snowflake";
 
-interface AnnouncementParams {
+export interface AnnouncementParams {
     content: string;
     creator: string;
     date?: Date;

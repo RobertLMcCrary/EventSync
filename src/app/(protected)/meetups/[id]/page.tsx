@@ -165,7 +165,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
     const undecidedData = formatMemberString(meetupUndecided);
     const unavailableData = formatMemberString(meetupUnavailable);
 
-    async function createAnnouncement(e){
+    async function createAnnouncement(e: any){
         e.preventDefault();
         if (announcementInput == ""){
             return;
@@ -234,7 +234,7 @@ export default function MeetupProfile({params}: { params: { id: string } }) {
                                     <h1 className="text-2xl font-semibold mr-2">
                                         {meetup.title}
                                     </h1>
-                                    <PencilSquareIcon onClick={() => router.push('/meetups/'+meetup._id+'/edit')} className="block w-6 mt-0.5 mr-4 h-6 text-gray-500 hover:text-gray-400 transition-all"/></>
+                                    <PencilSquareIcon onClick={() => router.push('/meetups/'+meetup?._id+'/edit')} className="block w-6 mt-0.5 mr-4 h-6 text-gray-500 hover:text-gray-400 transition-all"/></>
                                     : <Skeleton className="w-[3/5] h-5 rounded-md"/>
                                 }
 

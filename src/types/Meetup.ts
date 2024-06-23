@@ -1,5 +1,5 @@
 import {generateSnowflake} from "../db/utils/snowflake";
-import {Announcement} from "./Announcement";
+import {Announcement, AnnouncementParams} from "./Announcement";
 import {defaultUser} from "./User";
 
 // TODO: Decide on the fields for a Meetup
@@ -47,7 +47,7 @@ class Meetup {
                 if (announcement instanceof Announcement) {
                     return announcement;
                 } else {
-                    return new Announcement(announcement);
+                    return new Announcement(announcement as AnnouncementParams);
                 }
             });
         } else {

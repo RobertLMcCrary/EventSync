@@ -70,16 +70,7 @@ export default function UserProfile({ params }: { params: { id: string } }) {
                 Upcoming meetups
               </h1>
               <div className="flex flex-wrap p-4 gap-4 overflow-y-scroll h-full">
-                {visibleMeetups.toReversed().map((meetup, i) => (
-                  <div className="w-full" key={i}>
-                    <MeetupCard
-                      meetup={meetup}
-                      creator={user}
-                      small={true}
-                      key={i}
-                    />
-                  </div>
-                ))}
+
               </div>
             </div>
           </div>

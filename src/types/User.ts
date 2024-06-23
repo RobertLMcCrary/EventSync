@@ -30,7 +30,7 @@ interface UserParams {
     incomingFriendRequests?: string[];
     bio?: string;
     location?: string;
-    pos?: Pos;
+    pos?: Pos | null;
 }
 
 class User {

@@ -29,9 +29,9 @@ export function UserCard({ user } : {user: User | null}) {
                 </div>
 
             </div>
-            {user?.interests.length > 0 ?
+            {(user?.interests.length ? user?.interests.length > 0 : false) ?
                 <div className="flex flex-wrap gap-4 mt-4">
-                    {user.interests.map((interest, index) => (
+                    {user?.interests.map((interest, index) => (
                         <span key={index} className="bg-blue-100 text-blue-500 text-xs px-2 py-1 rounded-md">{interest}</span>
                     ))}
                 </div> :
