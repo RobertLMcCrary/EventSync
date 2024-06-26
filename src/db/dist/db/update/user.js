@@ -47,7 +47,7 @@ function updateUser(userID, update) {
                 case 0: return [4 /*yield*/, connect_1.db.collection('users')];
                 case 1:
                     users = _a.sent();
-                    return [4 /*yield*/, users.updateOne({ _id: userID }, update)];
+                    return [4 /*yield*/, users.updateOne({ _id: userID }, update['update'], update['options'] || {})];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];

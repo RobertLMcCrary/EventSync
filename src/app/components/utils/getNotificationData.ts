@@ -49,7 +49,7 @@ export default function getNotificationData({notification, initiator, meetup} : 
             }
         case 10:
             return {
-                title: "New Announcement",
+                title: "New Announcement.ts",
                 message: `New announcement from ${meetup?.title}`,
             }
         case 11:

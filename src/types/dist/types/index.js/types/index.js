@@ -19,3 +19,4 @@ __exportStar(require("./User"), exports);
 __exportStar(require("./Meetup"), exports);
 __exportStar(require("./Session"), exports);
 __exportStar(require("./AppNotification"), exports);
+__exportStar(require("./GoogleAuth"), exports);

@@ -1,13 +1,14 @@
 // Attendees
-import {Button, Input, Autocomplete, AutocompleteItem, Avatar} from "@nextui-org/react";
-import {CheckIcon, XMarkIcon} from "@heroicons/react/24/solid";
+import {Button, Autocomplete, AutocompleteItem, Avatar} from "@nextui-org/react";
+import {XMarkIcon} from "@heroicons/react/24/solid";
 
 import {useState} from "react";
 import {User} from "@/types";
 import {SearchIcon} from "lucide-react";
 
 //  <Input  value={enteredName} onValueChange={(value) => setEnteredName(value)} endContent={<button disabled={!enteredName} onClick={addAttendee}><CheckIcon className="text-green-500 w-5 h-5 hover:text-green-400"/></button>} placeholder="Name / Email" className="w-full mt-2" />
-export default function CreateMeetupStep3({attendees, setAttendees, friends, userEmail, meetupCreationLoading, createMeetup} : {attendees: User[], setAttendees: (p: (prev: any) => any[]) => void, friends: (User|null)[], userEmail: string, meetupCreationLoading: 0 | 1 | 2, createMeetup: () => void}){
+export default function CreateMeetupStep3({attendees, setAttendees, friends, userEmail, meetupCreationLoading, createMeetup} : {attendees: User[], setAttendees: (p: (prev: any) => any[]) => void, friends: (User)[], userEmail: string, meetupCreationLoading: 0 | 1 | 2, createMeetup: () => void}){
+
     const [enteredName, setEnteredName] = useState<string>('');
     const [errorText, setErrorText] = useState<string>('');
 
@@ -38,8 +39,8 @@ export default function CreateMeetupStep3({attendees, setAttendees, friends, use
                 return;
             }
 
-            const psuedoUser = new User({username: id, _id: id, email: id, password: ""});
-            setAttendees((prev) => [...prev, psuedoUser]);
+            const pseudoUser = new User({username: id, _id: id, email: id, password: ""});
+            setAttendees((prev) => [...prev, pseudoUser]);
             setErrorText('');
         }
         setEnteredName('')
@@ -61,14 +62,13 @@ export default function CreateMeetupStep3({attendees, setAttendees, friends, use
                 </div>
 
                 <div className=" mt-2 flex flex-row items-center">
-                    {friends.length == 1 && !friends[0] ? <p>Loading friends...</p> :
                      <Autocomplete
                     classNames={{
                         base: "max-w-xs",
                         listboxWrapper: "max-h-[320px]",
                         selectorButton: "text-default-500"
                     }}
-                    defaultItems={friends.filter((user): user is User => user != null)}
+                    defaultItems={friends}
                     inputProps={{
                         classNames: {
                             input: "ml-1",
@@ -108,22 +108,31 @@ export default function CreateMeetupStep3({attendees, setAttendees, friends, use
                     radius="full"
                     variant="bordered"
                 >
-                    {(user: User) => (
-                        <AutocompleteItem key={user._id} textValue={user.username}>
-                            <div className="flex justify-between items-center">
-                                <div className="flex gap-2 items-center">
-                                    <Avatar alt={user.username} className="flex-shrink-0" size="sm" src={user.avatar} />
-                                    <div className="flex flex-col">
-                                        <span className="text-small">{user.username}</span>
-                                        <span className="text-tiny text-default-400">{user.email}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </AutocompleteItem>
-                    )}
-                </Autocomplete> }
+                         {(user: User) => (
+                             user._id != "0" && user._id != "loading" ?
+                                 <AutocompleteItem key={user._id} textValue={user.username}>
+                                     <div className="flex justify-between items-center">
+                                         <div className="flex gap-2 items-center">
+                                             <Avatar alt={user.username} className="flex-shrink-0" size="sm"
+                                                     src={user.avatar}/>
+                                             <div className="flex flex-col">
+                                                 <span className="text-small">{user.username}</span>
+                                                 <span className="text-tiny text-default-400">{user.email}</span>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </AutocompleteItem> :
+                                 user._id == "0" ? <AutocompleteItem key="0" isDisabled={true}>
+                                     <p>No friends</p>
+                                 </AutocompleteItem> :
+                                     <AutocompleteItem key="loading" isDisabled={true}>
+                                            <p>Loading...</p>
+                                     </AutocompleteItem>
+                         )}
 
-                    <Button color="primary" disabled={!enteredName} onClick={() => addAttendee(enteredName, false)}className=" w-auto rounded-full ml-2 h-[48px]">Add</Button>
+                </Autocomplete>
+
+                    <Button color="primary" disabled={!enteredName} onClick={() => addAttendee(enteredName, false)} className=" w-auto rounded-full ml-2 h-[48px]">Add</Button>
                 </div>
                 <p className="text-xs mt-0.5 text-red-500">{errorText}</p>
                 <Button isLoading={meetupCreationLoading==1} onClick={createMeetup} color="primary" className="mt-2 w-full">Create</Button>

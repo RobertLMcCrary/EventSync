@@ -10,6 +10,8 @@ import {createUser} from "@/db/create/user";
 import {getUser} from "@/db/read/user";
 import {User} from "@/types";
 import hashPassword from "@/app/api/utils/hashPassword";
+import {db} from "@/db/connect";
+import {updateMeetup} from "@/db/update/meetup";
 
 export async function POST(request: NextRequest) {
     let {email, username, password} = await request.json();
@@ -18,21 +20,41 @@ export async function POST(request: NextRequest) {
     const user = await getUser({email});
 
     if (user) {
+<<<<<<< HEAD
         // return NextResponse.json({"error": 'Email already exists'});
+=======
+        return NextResponse.json({error: 'Email already exists'}, {status: 400});
+>>>>>>> 14ea82b7aa3d6abf5e7b044a052844e432a82d04
     }
     const user2 = await getUser({username});
 
     if (user2) {
+<<<<<<< HEAD
         // return NextResponse.json({"error": 'Username already exists'});
+=======
+        return NextResponse.json({error: 'Username already exists'}, {status: 400});
+>>>>>>> 14ea82b7aa3d6abf5e7b044a052844e432a82d04
     }
 
     password = await hashPassword(password);
+    const newUser = new User({email, username, password});
 
-    const newUser = await createUser(new User({email, username, password}));
+    // TODO: Find all meetups where the user is invited and create notifications
+
+    const meetupCollection = db.collection('meetups');
+    const meetups = await meetupCollection.find({invited: email}).toArray();
+
+    for (const meetup of meetups) {
+        // TODO: Create notification
+        await updateMeetup(meetup._id, {$pull: {invited: email}});
+        await updateMeetup(meetup._id, {$push: {invited: newUser._id}});
+    }
+
+    await createUser(newUser);
 
     // Ensure JWT_SECRET is defined
     if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is not defined');
+        return NextResponse.json({ error: 'JWT_SECRET is not defined' }, { status: 500 });
     }
     // Token can be either user or API token
     // User token gives access to user data
@@ -40,5 +62,5 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign({ userID: newUser._id, type: 'user' }, process.env.JWT_SECRET, {
         expiresIn: '100m',
     });
-    return NextResponse.json({ "token": token, "id": newUser._id });
+    return NextResponse.json({ token: token, id: newUser._id });
 }

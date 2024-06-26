@@ -4,7 +4,8 @@ import { db } from '../connect';
 
 async function updateUser(userID: string, update: any) : Promise<void> {
     const users = await db.collection('users');
-    await users.updateOne({ _id: userID }, update);
+
+    await users.updateOne({ _id: userID }, update['update'], update['options'] || {});
 }
 
 export { updateUser };

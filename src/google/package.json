@@ -1,0 +1,17 @@
+{
+  "name": "eventsync-google-auth",
+  "version": "1.0.0",
+  "description": "Handles google auth backend for eventsync",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "EventSync",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "googleapis": "^134.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

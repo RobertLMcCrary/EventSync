@@ -3,37 +3,30 @@ dotenv.config({ path: '.env.local' });
 import {NextRequest, NextResponse} from "next/server";
 import { createMeetup } from "@/db/create/meetup";
 import { createNotification } from "@/db/create/notification";
-import { updateUser } from "@/db/update/user";
 import { getUser } from "@/db/read/user";
 import {AppNotification, Meetup, User} from "@/types";
-import {headers} from "next/headers";
-import verifyJWT from "@/app/api/utils/verifyJWT";
 import jwt from "jsonwebtoken";
+import protectedRoute from "@/app/api/utils/protected";
+import {headers} from "next/headers";
 
 export async function POST(request: NextRequest) {
     const headersInstance = headers();
-    const authorization = headersInstance.get('authorization');
-    const data = verifyJWT(authorization);
-
-    if ("error" in data) {
-        return NextResponse.json({error: data.error})
-    }
-    if (data.type == "api"){
-        // Do additional checks for scopes
+    const isAuthorized = protectedRoute(headersInstance);
+    if (isAuthorized.status !== 200) {
+        return isAuthorized;
     }
 
     const meetupData = await request.json(); // Get user data from request body
     meetupData.date = new Date(meetupData.date);
     const meetup = new Meetup(meetupData); // Create new user object from data
 
-    meetup.invited.map(async (attendee: string) => {
-        console.log(attendee);
+    await Promise.all(meetup.invited.map(async (attendee: string) => {
         if (attendee.includes('@')) {
             const user = await getUser({email: attendee});
             if (!user) {
                 if (!process.env.JWT_SECRET) {
                     // This should never happen
-                    throw new Error('JWT_SECRET is not defined');
+                    return NextResponse.json({ error: 'JWT_SECRET is not defined' }, { status: 500 });
                 }
                 const expiresIn = (meetup.date.getTime() - new Date().getTime()) / 1000 / 60; // Invitation expires when the meetup starts
                 const token = jwt.sign({ userID: attendee, meetup: meetup._id, type: 'meetup-invitation' }, process.env.JWT_SECRET, {
@@ -49,16 +42,21 @@ export async function POST(request: NextRequest) {
                 });
 
             } else {
-                meetup.invited = meetup.invited.filter((invitedUser) => invitedUser !== attendee);
-                meetup.attendees.push(user._id);
+
+                let index = meetup.invited.indexOf(attendee);
+
+                if (index !== -1) {
+                    meetup.invited[index] = user._id
+                }
                 await notifyUser(meetup, user)
             }
         } else {
             const user = await getUser({userID: attendee});
             await notifyUser(meetup, user)
         }
-    });
-    await createMeetup(meetup); // Create user in database
+    }));
+
+    await createMeetup(meetup); // Create meetup in database
     return NextResponse.json(meetup.toJSON()); // Return meetup data as JSON
 }
 
@@ -83,13 +81,22 @@ async function notifyUser(meetup: Meetup, attendee: User | null) {
         type: 1
     });
 
-    await fetch(process.env.NEXT_PUBLIC_MAIL_URL + '/send-meetup-invite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email: attendee.email, inviteLink: `https://beta.eventsync.app/meetups/invite/${token}`, meetupName: meetup.title}),
-    });
 
     await createNotification(notification);
+
+    try {
+        await fetch(process.env.NEXT_PUBLIC_MAIL_URL + '/send-meetup-invite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: attendee.email,
+                inviteLink: `https://beta.eventsync.app/meetups/invite/${token}`,
+                meetupName: meetup.title
+            }),
+        });
+    } catch {
+        return;
+    }
 }

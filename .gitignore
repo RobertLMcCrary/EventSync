@@ -10,7 +10,9 @@
 
 # testing
 /coverage
-
+src/types/node_modules
+src/db/node_modules
+src/mail/node_modules
 # next.js
 /.next/
 /out/
