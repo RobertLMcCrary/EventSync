@@ -9,6 +9,40 @@ import {Button} from "@nextui-org/react";
 
 
 export default function Login() {
+
+
+    function fetchVerificationCode(){
+        fetch(process.env.NEXT_PUBLIC_MAIL_URL + '/send-test-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username }),
+        }).then((res) => {
+            res.json().then((data) => {
+                if (data.error) {
+                    // setVerificationError(data.error);
+                } else {
+                    // setVerificationCode(data.message);
+                }
+            });
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +50,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const forgotPassword = useRouter();
 
     const handleSubmit = (e: { preventDefault: () => void; })  => {
         // POST request to /api/auth/signup
@@ -36,6 +71,7 @@ export default function Login() {
                     } else {
                         // Redirect to dashboard
                         Cookies.set('token', data.token);
+                        fetchVerificationCode();
                         router.push('/dashboard')
                     }
                 });
@@ -48,7 +84,7 @@ export default function Login() {
                 <h2 className="text-black dark:text-white text-left text-3xl font-semibold mb-2">Log In</h2>
                 <p className="text-gray-400 text-left text-sm mb-4">
                     Don&apos;t have an account?{' '}
-                    <a className="underline text-blue-500 cursor-pointer" onClick={() => router.push('/signup')}>Sign Up</a>
+                    <a className="underline text-blue-500 cursor-pointer" onClick={() => router.push('/signUp')}>Sign Up</a>
                 </p>
                 <form onSubmit={handleSubmit}>
                     <div className="relative mb-2">
@@ -79,7 +115,7 @@ export default function Login() {
                         </div>
                     </div>
                     <p className="text-red-500 text-sm mb-4">{error}</p>
-                    <p className="text-blue-500  mb-2 text-sm cursor-pointer">Forgot Password?</p>
+                    <p className="text-blue-500  mb-2 text-sm cursor-pointer"  onClick={() => router.push('/forgotPassword')}>Forgot Password?</p>
 
                     <Button type="submit"  className="w-full bg-blue-500 flex items-center justify-center filter drop-shadow-md text-white px-4 py-3 rounded-lg cursor-pointer text-base" isLoading={isLoading}>
                         Log In <ArrowLongRightIcon className="ml-4 w-6 h-6" />

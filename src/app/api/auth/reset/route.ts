@@ -17,14 +17,6 @@ export async function POST(request: NextRequest) {
 
     const user = await getUser({email});
 
-    if (user) {
-        // return NextResponse.json({"error": 'Email already exists'});
-    }
-    const user2 = await getUser({username});
-
-    if (user2) {
-        // return NextResponse.json({"error": 'Username already exists'});
-    }
 
     password = await hashPassword(password);
 
